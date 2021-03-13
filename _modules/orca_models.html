@@ -1,0 +1,963 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>orca_models &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../orca_predict.html">orca_predict module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_utils.html">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_models.html">orca_models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_modules.html">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>orca_models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for orca_models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the class definition of all Orca models.</span>
+<span class="sd">For usage of the models, see the orca_predict module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+
+<span class="kn">from</span> <span class="nn">orca_modules</span> <span class="k">import</span> <span class="n">Encoder</span><span class="p">,</span> <span class="n">Encoder2</span><span class="p">,</span> <span class="n">Encoder3</span><span class="p">,</span> <span class="n">Decoder</span><span class="p">,</span> <span class="n">Decoder_1m</span><span class="p">,</span> <span class="n">Net</span>
+
+<span class="n">ORCA_PATH</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="H1esc"><a class="viewcode-back" href="../orca_models.html#orca_models.H1esc">[docs]</a><span class="k">class</span> <span class="nc">H1esc</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca H1-ESC model (1-32Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net0 : nn.DataParallel(Encoder)</span>
+<span class="sd">        The first section of the multi-resolution encoder </span>
+<span class="sd">        (bp resolution to 4kb resolution).</span>
+<span class="sd">    net : nn.DataParallel(Encoder2)</span>
+<span class="sd">        The second section of the multi-resolution encoder </span>
+<span class="sd">        (4kb resolution to 128kb resolution).</span>
+<span class="sd">    denets : dict(int: nn.DataParallel(Decoder))</span>
+<span class="sd">        Decoders at each level, which are stored in a dictionary</span>
+<span class="sd">        with an integer as key.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">H1esc</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="s2">&quot;h1esc&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder2</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d1.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d2.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d4.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d8.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d16.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d32.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder</span><span class="p">())</span>
+        <span class="n">net0_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net0.statedict&quot;</span><span class="p">,</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net0_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder_1m</span><span class="p">())</span>
+        <span class="n">denet_1_pt_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net0.statedict&quot;</span><span class="p">,</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">denet_1_pt_dict</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">expected_log</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI9GMP2J8.rebinned.mcool.expected.res4000.npy&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">normmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">expected_log</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])])</span>
+
+        <span class="n">normmat_r1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">250</span><span class="p">,</span> <span class="p">:</span><span class="mi">250</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">500</span><span class="p">,</span> <span class="p">:</span><span class="mi">500</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">1000</span><span class="p">,</span> <span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">2000</span><span class="p">,</span> <span class="p">:</span><span class="mi">2000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r16</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">4000</span><span class="p">,</span> <span class="p">:</span><span class="mi">4000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">normmat_r32</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">8000</span><span class="p">,</span> <span class="p">:</span><span class="mi">8000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">eps1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r1</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r2</span><span class="p">)</span>
+        <span class="n">eps4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r4</span><span class="p">)</span>
+        <span class="n">eps8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r8</span><span class="p">)</span>
+        <span class="n">eps16</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r16</span><span class="p">)</span>
+        <span class="n">eps32</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r32</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">normmats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">normmat_r1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">normmat_r2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">normmat_r4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="n">normmat_r8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="n">normmat_r16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="n">normmat_r32</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epss</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">eps1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">eps2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="n">eps4</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="n">eps8</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="n">eps16</span><span class="p">,</span> <span class="mi">32</span><span class="p">:</span> <span class="n">eps32</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Hff"><a class="viewcode-back" href="../orca_models.html#orca_models.Hff">[docs]</a><span class="k">class</span> <span class="nc">Hff</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca HFF model (1-32Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net0 : nn.DataParallel(Encoder)</span>
+<span class="sd">        The first section of the multi-resolution encoder </span>
+<span class="sd">        (bp resolution to 4kb resolution).</span>
+<span class="sd">    net : nn.DataParallel(Encoder2)</span>
+<span class="sd">        The second section of the multi-resolution encoder </span>
+<span class="sd">        (4kb resolution to 128kb resolution).</span>
+<span class="sd">    denets : dict(int: nn.DataParallel(Decoder))</span>
+<span class="sd">        Decoders at each level, which are stored in a dictionary</span>
+<span class="sd">        with an integer as key.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Hff</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="s2">&quot;hff&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder2</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d1.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d2.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d4.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d8.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d16.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d32.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder</span><span class="p">())</span>
+        <span class="n">net0_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net0.statedict&quot;</span><span class="p">,</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net0_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder_1m</span><span class="p">())</span>
+        <span class="n">denet_1_pt_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net0.statedict&quot;</span><span class="p">,</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">denet_1_pt_dict</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1_pt</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">expected_log</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI643OYP9.rebinned.mcool.expected.res4000.npy&quot;</span>
+        <span class="p">)</span>
+        <span class="n">normmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">expected_log</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])])</span>
+
+        <span class="n">normmat_r1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">250</span><span class="p">,</span> <span class="p">:</span><span class="mi">250</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">500</span><span class="p">,</span> <span class="p">:</span><span class="mi">500</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">1000</span><span class="p">,</span> <span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">2000</span><span class="p">,</span> <span class="p">:</span><span class="mi">2000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r16</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">4000</span><span class="p">,</span> <span class="p">:</span><span class="mi">4000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">normmat_r32</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">8000</span><span class="p">,</span> <span class="p">:</span><span class="mi">8000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">eps1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r1</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r2</span><span class="p">)</span>
+        <span class="n">eps4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r4</span><span class="p">)</span>
+        <span class="n">eps8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r8</span><span class="p">)</span>
+        <span class="n">eps16</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r16</span><span class="p">)</span>
+        <span class="n">eps32</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r32</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">normmats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">normmat_r1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">normmat_r2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">normmat_r4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="n">normmat_r8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="n">normmat_r16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="n">normmat_r32</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epss</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">eps1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">eps2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="n">eps4</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="n">eps8</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="n">eps16</span><span class="p">,</span> <span class="mi">32</span><span class="p">:</span> <span class="n">eps32</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HCTnoc"><a class="viewcode-back" href="../orca_models.html#orca_models.HCTnoc">[docs]</a><span class="k">class</span> <span class="nc">HCTnoc</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca cohesin-depleted HCT116 model (1-32Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net0 : nn.DataParallel(Encoder)</span>
+<span class="sd">        The first section of the multi-resolution encoder </span>
+<span class="sd">        (bp resolution to 4kb resolution).</span>
+<span class="sd">    net : nn.DataParallel(Encoder2)</span>
+<span class="sd">        The second section of the multi-resolution encoder </span>
+<span class="sd">        (4kb resolution to 128kb resolution).</span>
+<span class="sd">    denets : dict(int: nn.DataParallel(Decoder))</span>
+<span class="sd">        Decoders at each level, which are stored in a dictionary</span>
+<span class="sd">        with an integer as key.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HCTnoc</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="s2">&quot;hctnoc&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder2</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d1.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d2.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d4.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d8.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d16.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d32.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net0.statedict&quot;</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">smooth_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFILP99QJS.HCT_auxin6h.rebinned.mcool.expected.res4000.npy&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">normmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">smooth_diag</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8000</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])])</span>
+
+        <span class="n">normmat_r1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">250</span><span class="p">,</span> <span class="p">:</span><span class="mi">250</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">500</span><span class="p">,</span> <span class="p">:</span><span class="mi">500</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">1000</span><span class="p">,</span> <span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">2000</span><span class="p">,</span> <span class="p">:</span><span class="mi">2000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">normmat_r16</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">4000</span><span class="p">,</span> <span class="p">:</span><span class="mi">4000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">normmat_r32</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">[:</span><span class="mi">8000</span><span class="p">,</span> <span class="p">:</span><span class="mi">8000</span><span class="p">],</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">eps1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r1</span><span class="p">)</span>
+        <span class="n">eps2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r2</span><span class="p">)</span>
+        <span class="n">eps4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r4</span><span class="p">)</span>
+        <span class="n">eps8</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r8</span><span class="p">)</span>
+        <span class="n">eps16</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r16</span><span class="p">)</span>
+        <span class="n">eps32</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r32</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">normmats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">normmat_r1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">normmat_r2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">normmat_r4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="n">normmat_r8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="n">normmat_r16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="n">normmat_r32</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epss</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">eps1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">eps2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="n">eps4</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="n">eps8</span><span class="p">,</span> <span class="mi">16</span><span class="p">:</span> <span class="n">eps16</span><span class="p">,</span> <span class="mi">32</span><span class="p">:</span> <span class="n">eps32</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_1</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_2</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_4</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_8</span><span class="p">,</span>
+            <span class="mi">16</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_16</span><span class="p">,</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="H1esc_1M"><a class="viewcode-back" href="../orca_models.html#orca_models.H1esc_1M">[docs]</a><span class="k">class</span> <span class="nc">H1esc_1M</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca H1-ESC model (1Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : nn.DataParallel(Net)</span>
+<span class="sd">        Integrated Encoder and Decoder for 1Mb model.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">H1esc_1M</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Net</span><span class="p">(</span><span class="n">num_1d_features</span><span class="o">=</span><span class="mi">32</span><span class="p">))</span>
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="n">net_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_h1esc.net0.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">expected_log</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI9GMP2J8.rebinned.mcool.expected.res1000.npy&quot;</span>
+        <span class="p">)[:</span><span class="mi">1000</span><span class="p">]</span>
+
+        <span class="n">normmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">expected_log</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])])</span>
+
+        <span class="n">normmat_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">,</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">normmats</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">normmat_r</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epss</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">eps</span><span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
+
+<div class="viewcode-block" id="H1esc_1M.forward"><a class="viewcode-back" href="../orca_models.html#orca_models.H1esc_1M.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">pred</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pred</span></div></div>
+
+
+<div class="viewcode-block" id="Hff_1M"><a class="viewcode-back" href="../orca_models.html#orca_models.Hff_1M">[docs]</a><span class="k">class</span> <span class="nc">Hff_1M</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca HFF model (1Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : nn.DataParallel(Net)</span>
+<span class="sd">        Integrated Encoder and Decoder for 1Mb model.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Hff_1M</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Net</span><span class="p">(</span><span class="n">num_1d_features</span><span class="o">=</span><span class="mi">22</span><span class="p">))</span>
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="n">net_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_hff.net0.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI643OYP9.rebinned.mcool.expected.res1000.npy&quot;</span><span class="p">)[</span>
+                <span class="p">:</span><span class="mi">1000</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">normmat</span> <span class="o">=</span> <span class="n">expected</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])]</span>
+
+        <span class="n">normmat_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">normmat</span><span class="p">,</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">normmat_r</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">normmats</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">normmat_r</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epss</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">eps</span><span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Hff_1M.forward"><a class="viewcode-back" href="../orca_models.html#orca_models.Hff_1M.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">pred</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pred</span></div></div>
+
+
+<div class="viewcode-block" id="H1esc_256M"><a class="viewcode-back" href="../orca_models.html#orca_models.H1esc_256M">[docs]</a><span class="k">class</span> <span class="nc">H1esc_256M</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca H1-ESC model (32-256Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net0 : nn.DataParallel(Encoder)</span>
+<span class="sd">        The first section of the multi-resolution encoder </span>
+<span class="sd">        (bp resolution to 4kb resolution).</span>
+<span class="sd">    net1 : nn.DataParallel(Encoder2)</span>
+<span class="sd">        The second section of the multi-resolution encoder </span>
+<span class="sd">        (4kb resolution to 128kb resolution).</span>
+<span class="sd">    net : nn.DataParallel(Encoder3)</span>
+<span class="sd">        The third section of the multi-resolution encoder </span>
+<span class="sd">        (128kb resolution to 1024kb resolution).</span>
+<span class="sd">    denets : dict(int: nn.DataParallel(Decoder))</span>
+<span class="sd">        Decoders at each level, which are stored in a dictionary</span>
+<span class="sd">        with an integer as key.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">H1esc_256M</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="s2">&quot;h1esc_256m&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder3</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d32.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d64.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d128.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d256.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder</span><span class="p">())</span>
+        <span class="n">net0_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_h1esc.net0.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net0_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder2</span><span class="p">())</span>
+        <span class="n">net1_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_h1esc.net.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net1_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI9GMP2J8.rebinned.mcool.expected.res32000.mono.npy&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI9GMP2J8.rebinned.mcool.expected.res32000.trans.npy&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="p">,</span>
+            <span class="mi">64</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="p">,</span>
+            <span class="mi">128</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="p">,</span>
+            <span class="mi">256</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Hff_256M"><a class="viewcode-back" href="../orca_models.html#orca_models.Hff_256M">[docs]</a><span class="k">class</span> <span class="nc">Hff_256M</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Orca HFF model (32-256Mb) </span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net0 : nn.DataParallel(Encoder)</span>
+<span class="sd">        The first section of the multi-resolution encoder </span>
+<span class="sd">        (bp resolution to 4kb resolution).</span>
+<span class="sd">    net1 : nn.DataParallel(Encoder2)</span>
+<span class="sd">        The second section of the multi-resolution encoder </span>
+<span class="sd">        (4kb resolution to 128kb resolution).</span>
+<span class="sd">    net : nn.DataParallel(Encoder3)</span>
+<span class="sd">        The third section of the multi-resolution encoder </span>
+<span class="sd">        (128kb resolution to 1024kb resolution).</span>
+<span class="sd">    denets : dict(int: nn.DataParallel(Decoder))</span>
+<span class="sd">        Decoders at each level, which are stored in a dictionary</span>
+<span class="sd">        with an integer as key.</span>
+<span class="sd">    normmats : dict(int: numpy.ndarray)</span>
+<span class="sd">        The distance-based background matrices with expected log</span>
+<span class="sd">        fold over background values at each level.</span>
+<span class="sd">    epss : dict(int: float)</span>
+<span class="sd">        The minimum background value at each level. Used for </span>
+<span class="sd">        stablizing the log fold computation by adding</span>
+<span class="sd">        to both the nominator and the denominator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Hff_256M</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="s2">&quot;hff_256m&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder3</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Decoder</span><span class="p">())</span>
+
+        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.net.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d32.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d64.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d128.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_&quot;</span> <span class="o">+</span> <span class="n">modelstr</span> <span class="o">+</span> <span class="s2">&quot;.d256.statedict&quot;</span><span class="p">,</span>
+                <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder</span><span class="p">())</span>
+        <span class="n">net0_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_hff.net0.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="s2">&quot;module.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net0_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">Encoder2</span><span class="p">())</span>
+        <span class="n">net1_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="n">pretrained_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/models/orca_hff.net.statedict&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">pretrained_dict_filtered</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">pretrained_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net1_dict</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pretrained_dict_filtered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net0</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI643OYP9.rebinned.mcool.expected.res32000.mono.npy&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/4DNFI643OYP9.rebinned.mcool.expected.res32000.trans.npy&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">denets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">32</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_32</span><span class="p">,</span>
+            <span class="mi">64</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_64</span><span class="p">,</span>
+            <span class="mi">128</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_128</span><span class="p">,</span>
+            <span class="mi">256</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">denet_256</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

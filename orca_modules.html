@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>orca_modules module &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="selene_utils2 module" href="selene_utils2.html" />
+    <link rel="prev" title="orca_models module" href="orca_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="orca_predict.html">orca_predict module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_utils.html">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_models.html">orca_models module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>orca_modules module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/orca_modules.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-orca_modules">
+<span id="orca-modules-module"></span><h1>orca_modules module<a class="headerlink" href="#module-orca_modules" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the encoder and decoder modules which
+are components of the Orca models.</p>
+<dl class="class">
+<dt id="orca_modules.Decoder">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Decoder</code><a class="reference internal" href="_modules/orca_modules.html#Decoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Decoder.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">distenc</em>, <em class="sig-param">y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Decoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Decoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_modules.Decoder_1m">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Decoder_1m</code><a class="reference internal" href="_modules/orca_modules.html#Decoder_1m"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Decoder_1m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Decoder_1m.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Decoder_1m.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Decoder_1m.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_modules.Encoder">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Encoder</code><a class="reference internal" href="_modules/orca_modules.html#Encoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Encoder.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Encoder.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagation of a batch.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_modules.Encoder2">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Encoder2</code><a class="reference internal" href="_modules/orca_modules.html#Encoder2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Encoder2.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Encoder2.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder2.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagation of a batch.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_modules.Encoder3">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Encoder3</code><a class="reference internal" href="_modules/orca_modules.html#Encoder3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Encoder3.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Encoder3.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Encoder3.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagation of a batch.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_modules.Net">
+<em class="property">class </em><code class="sig-prename descclassname">orca_modules.</code><code class="sig-name descname">Net</code><span class="sig-paren">(</span><em class="sig-param">num_1d_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Net"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="method">
+<dt id="orca_modules.Net.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_modules.html#Net.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_modules.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagation of a batch.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="selene_utils2.html" class="btn btn-neutral float-right" title="selene_utils2 module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="orca_models.html" class="btn btn-neutral float-left" title="orca_models module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

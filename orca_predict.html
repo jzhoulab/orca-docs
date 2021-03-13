@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>orca_predict module &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="orca_utils module" href="orca_utils.html" />
+    <link rel="prev" title="Welcome to Orca’s API documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">orca_predict module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_utils.html">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_models.html">orca_models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_modules.html">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>orca_predict module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/orca_predict.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-orca_predict">
+<span id="orca-predict-module"></span><h1>orca_predict module<a class="headerlink" href="#module-orca_predict" title="Permalink to this headline">¶</a></h1>
+<p>This module provides functions for using Orca models for various
+types of the predictions. This is the main module that you need for
+interacting with Orca models.</p>
+<p>To use any of the prediction functions, <cite>load_resources</cite> has to be
+called first to load the necessary resources.</p>
+<p>The coordinates used in Orca are 0-based, inclusive for the start
+coordinate and exclusive for the end coordinate, consistent with
+python conventions.</p>
+<dl class="function">
+<dt id="orca_predict.genomepredict">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">genomepredict</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">mchr</em>, <em class="sig-param">mpos=-1</em>, <em class="sig-param">wpos=-1</em>, <em class="sig-param">targets=None</em>, <em class="sig-param">annotation=None</em>, <em class="sig-param">use_cuda=True</em>, <em class="sig-param">nan_thresh=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#genomepredict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.genomepredict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiscale prediction for a 32Mb sequence
+input, zooming into the position specified when generating a series
+of 32Mb, 16Mb, 8Mb, 4Mb, 2Mb and 1Mb predictions with increasing
+resolutions (up to 4kb). This function also processes
+information used only for plotting including targets and annotation.</p>
+<p>For larger sequence and interchromosomal predictions, you can use
+256Mb input with genomepredict_256Mb.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>numpy.ndarray</em>) – One-hot sequence encoding of shape 1 x 4 x 32000000.
+The encoding can be generated with <cite>selene_sdk.Genome.sequence_to_encoding()</cite>.</p></li>
+<li><p><strong>mchr</strong> (<em>str</em>) – Chromosome name. This is used for annotation purpose only.</p></li>
+<li><p><strong>mpos</strong> (<em>int</em><em>, </em><em>optional</em>) – The coordinate to zoom into for multiscale prediction.</p></li>
+<li><p><strong>wpos</strong> (<em>int</em><em>, </em><em>optional</em>) – The coordinate of the center position of the sequence, which is
+start position + 16000000.</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>(</em><em>numpy.ndarray</em><em>)</em><em>, </em><em>optional</em>) – The observed balanced contact matrices for H1-ESC and HFF from the
+32Mb region. Used only for plotting when used with genomeplot.
+The dimensions of the arrays should be 8000 x 8000 (1kb resolution).</p></li>
+<li><p><strong>annotation</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of annotations for plotting. The annotation can be generated with
+See orca_utils.process_anno and see its documentation for more details.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If False, use CPU.</p></li>
+<li><p><strong>nan_thresh</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 1. Specify the threshold of the proportion of NaNs values
+allowed during downsampling for the observed matrices. Only relevant for plotting.
+The lower resolution observed matrix value are computed by averaging multiple
+bins into one. By default, we allow missing values and only average over the
+non-missing values, and the values with more than the specified proprotion
+of missing values will be filled with NaN.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>output</strong> – Result dictionary that can be used as input for genomeplot. The dictionary
+has the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>predictions<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Multi-level predictions for H1-ESC and HFF cell types.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>experiments<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Observations for H1-ESC and HFF cell types that matches the predictions.
+Exists if <cite>targets</cite> is specified.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>normmats<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Background distance-based expected balanced contact matrices for
+H1-ESC and HFF cell types that matches the predictions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>start_coords<span class="classifier">list(int)</span></dt><dd><p>Start coordinates for the prediction at each level.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>end_coords<span class="classifier">list(int)</span></dt><dd><p>End coordinates for the prediction at each level.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>chr<span class="classifier">str</span></dt><dd><p>The chromosome name.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>annos<span class="classifier">list(list(…))</span></dt><dd><p>Annotation information. The format is as outputed by orca_utils.process_anno
+Exists if <cite>annotation</cite> is specified.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.genomepredict_256Mb">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">genomepredict_256Mb</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">mchr</em>, <em class="sig-param">normmats</em>, <em class="sig-param">chrlen</em>, <em class="sig-param">mpos=-1</em>, <em class="sig-param">wpos=-1</em>, <em class="sig-param">targets=None</em>, <em class="sig-param">annotation=None</em>, <em class="sig-param">padding_chr=None</em>, <em class="sig-param">use_cuda=True</em>, <em class="sig-param">nan_thresh=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#genomepredict_256Mb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.genomepredict_256Mb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiscale prediction for a 256Mb sequence
+input, zooming into the position specified when generating a series
+of 256Mb, 128Mb, 64Mb, and 32Mb predictions with increasing
+resolutions (up to 128kb). This function also processes
+information used only for plotting including targets and annotation.</p>
+<p>This function accepts multichromosal input sequence. Thus it needs an
+extra input <cite>normmats</cite> to encode the chromosomal information. See documentation
+for normmats argument for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>numpy.ndarray</em>) – One-hot sequence encoding of shape 1 x 4 x 256000000.
+The encoding can be generated with <cite>selene_sdk.Genome.sequence_to_encoding()</cite>.</p></li>
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first chromosome included in the seqeunce.
+This is used for annotation purpose only.</p></li>
+<li><p><strong>normmats</strong> (<em>list</em><em>(</em><em>numpy.ndarray</em><em>)</em>) – A list of distance-based background matrices for H1-ESC and HFF.The
+normmats contains arrays with dimensions 8000 x 8000  (32kb resolution).
+Interchromosomal interactions are filled with the expected balanced contact
+score for interchromomsal interactions.</p></li>
+<li><p><strong>chrlen</strong> (<em>int</em>) – The coordinate of the end of the first chromosome in the input, which is the
+chromosome that will be zoomed into.</p></li>
+<li><p><strong>mpos</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The coordinate to zoom into for multiscale prediction. If neither
+<cite>mpos</cite> nor <cite>wpos</cite> are specified, it zooms into the center of the input by default.</p></li>
+<li><p><strong>wpos</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The coordinate of the center position of the sequence, which is
+start position + 16000000. If neither <cite>mpos</cite> nor <cite>wpos</cite> are specified, it zooms
+into the center of the input by default.</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>(</em><em>numpy.ndarray</em><em>)</em><em>, </em><em>optional</em>) – Default is None. A list of observed balanced contact matrices for H1-ESC and HFF from the
+256Mb input, which may include interchromosomal interactions. Used only for
+plotting when used with genomeplot. The dimensions of the arrays should be
+8000 x 8000 (32kb resolution).</p></li>
+<li><p><strong>annotation</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. List of annotations for plotting. The annotation can be generated with
+See orca_utils.process_anno and see its documentation for more details.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>None</em><em>, </em><em>optional</em>) – Default is None. Name of the padding chromosome after the first. Used for annotation
+only. TODO: be more flexible in the support for multiple chromosomes.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If False, use CPU.</p></li>
+<li><p><strong>nan_thresh</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 1. Specify the threshold of the proportion of NaNs values
+allowed during downsampling for the observed matrices. Only relevant for plotting.
+The lower resolution observed matrix value are computed by averaging multiple
+bins into one. By default, we allow missing values and only average over the
+non-missing values, and the values with more than the specified proprotion
+of missing values will be filled with NaN.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>output</strong> – Result dictionary that can be used as input for genomeplot. The dictionary
+has the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>predictions<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Multi-level predictions for H1-ESC and HFF cell types.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>experiments<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Observations for H1-ESC and HFF cell types that matches the predictions.
+Exists if <cite>targets</cite> is specified.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>normmats<span class="classifier">list(list(numpy.ndarray), list(numpy.ndarray))</span></dt><dd><p>Background distance-based expected balanced contact matrices for
+H1-ESC and HFF cell types that matches the predictions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>start_coords<span class="classifier">list(int)</span></dt><dd><p>Start coordinates for the prediction at each level.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>end_coords<span class="classifier">list(int)</span></dt><dd><p>End coordinates for the prediction at each level.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>chr<span class="classifier">str</span></dt><dd><p>The chromosome name.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>annos<span class="classifier">list(list(…))</span></dt><dd><p>Annotation information. The format is as outputed by orca_utils.process_anno
+Exists if <cite>annotation</cite> is specified.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.load_resources">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">load_resources</code><span class="sig-paren">(</span><em class="sig-param">models=['32M'], use_cuda=True, use_memmapgenome=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#load_resources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.load_resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load resources for Orca predictions including the specified
+Orca models and hg38 reference genome. It also creates Genomic2DFeatures
+objects for experimental micro-C  datasets (for comparison with prediction).
+Load resourced are accessible as global variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>models</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – List of model types to load, supported model types includes
+“32M”, “256M”, “1M”, corresponding to 1-32Mb, 32-256Mb, and 1Mb
+models. Lower cases are also accepted.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If true, loaded models are moved to GPU.</p></li>
+<li><p><strong>use_memmapgenome</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True and the resource file for hg38 mmap exists,
+use MemmapGenome instead of Genome.</p></li>
+<li><p><strong>variables</strong> (<em>Global</em>) – </p></li>
+<li><p><strong>----------------</strong> – </p></li>
+<li><p><strong>hg38</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>MemmapGenome</em></a><em> or </em><em>Genome</em>) – If <cite>use_memmapgenome==True</cite> and the resource file for hg38 mmap exists,
+use MemmapGenome instead of Genome.</p></li>
+<li><p><strong>h1esc</strong> (<a class="reference internal" href="orca_models.html#orca_models.H1esc" title="orca_models.H1esc"><em>orca_models.H1esc</em></a>) – 1-32Mb Orca H1-ESC model</p></li>
+<li><p><strong>hff</strong> (<a class="reference internal" href="orca_models.html#orca_models.Hff" title="orca_models.Hff"><em>orca_models.Hff</em></a>) – 1-32Mb Orca HFF model</p></li>
+<li><p><strong>h1esc_256m</strong> (<a class="reference internal" href="orca_models.html#orca_models.H1esc_256M" title="orca_models.H1esc_256M"><em>orca_models.H1esc_256M</em></a>) – 32-256Mb Orca H1-ESC model</p></li>
+<li><p><strong>hff_256m</strong> (<a class="reference internal" href="orca_models.html#orca_models.Hff_256M" title="orca_models.Hff_256M"><em>orca_models.Hff_256M</em></a>) – 32-256Mb Orca HFF model</p></li>
+<li><p><strong>h1esc_1m</strong> (<a class="reference internal" href="orca_models.html#orca_models.H1esc_1M" title="orca_models.H1esc_1M"><em>orca_models.H1esc_1M</em></a>) – 1Mb Orca H1-ESC model</p></li>
+<li><p><strong>hff_1m</strong> (<a class="reference internal" href="orca_models.html#orca_models.Hff_1M" title="orca_models.Hff_1M"><em>orca_models.Hff_1M</em></a>) – 1Mb Orca HFF model</p></li>
+<li><p><strong>target_h1esc</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8
+at 4kb resolution, used for comparison with 1-32Mb models.</p></li>
+<li><p><strong>target_hff</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9
+at 4kb resolution, used for comparison with 1-32Mb models.</p></li>
+<li><p><strong>target_h1esc_256m</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8
+at 32kb resolution, used for comparison with 32-256Mb models.</p></li>
+<li><p><strong>target_hff_256m</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9
+at 32kb resolution, used for comparison with 32-256Mb models.</p></li>
+<li><p><strong>target_h1esc_1m</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8
+at 32kb resolution, used for comparison with 1Mb models.</p></li>
+<li><p><strong>target_hff_1m</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9
+at 1kb resolution, used for comparison with 1Mb models.</p></li>
+<li><p><strong>target_available</strong> (<em>bool</em>) – Indicate whether the micro-C dataset resource file is available.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_custom">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_custom</code><span class="sig-paren">(</span><em class="sig-param">region_list</em>, <em class="sig-param">ref_region_list</em>, <em class="sig-param">mpos</em>, <em class="sig-param">genome</em>, <em class="sig-param">ref_mpos_list=None</em>, <em class="sig-param">anno_list=None</em>, <em class="sig-param">ref_anno_list=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">file=None</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_custom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_custom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+a custom variant by an ordered list of genomic segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region_list</strong> (<em>list</em><em>(</em><em>list</em><em>(</em><em>..</em><em>)</em><em>)</em>) – List of segments to complete the alternative. Each segment is specified
+by a list( chr: str, start: int, end: int, strand: str), and segments
+are concatenated together in the given order. The total length
+should sum up to 32Mb. An example input is
+[[‘chr5’, 89411065, 89411065+16000000, ‘-‘], [‘chr7’, 94378248, 94378248+16000000,’+’]].</p></li>
+<li><p><strong>ref_region_list</strong> (<em>list</em><em>(</em><em>list</em><em>(</em><em>..</em><em>)</em><em>)</em>) – The reference regions to predict. This can be any reference regions with
+the length of the specified window size. If the Each reference region is specified
+with a list( chr: str, start: int, end: int, strand: str). The strand must
+be ‘+’. The intended use is predicting the genome interactions for each
+segment that constitute the alternative allele within the native
+reference sequence context. An example
+input is [[‘chr5’, 89411065-16000000, 89411065+16000000,’+’],
+[‘chr7’, 94378248-16000000, 94378248+16000000,’+’]].</p></li>
+<li><p><strong>mpos</strong> (<em>int</em>) – The position to zoom into in the alternative allele. Note that <cite>mpos</cite>
+here specify the relative position with respect to the to start of the 32Mb.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from.</p></li>
+<li><p><strong>ref_mpos_list</strong> (<em>list</em><em>(</em><em>int</em><em>) or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. List of positions to zoom into for each of the
+reference regions specified in <cite>ref_region_list</cite>. If not specified,
+then zoom into the center of each region. Note that <cite>ref_mpos_list</cite>
+specifies the relative positions with respect to start of the 32Mb.
+For example, <cite>16000000</cite> means the center of the sequence.</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. Currently only 16000000 (32Mb window) is accepted.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_l, outputs_ref_r, outputs_alt</strong> – Reference allele predictions zooming into the left boundary of the
+duplication,
+Reference allele predictions zooming into the right boundary of the
+duplication,
+Alternative allele predictions zooming into the duplication breakpoint.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_del">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_del</code><span class="sig-paren">(</span><em class="sig-param">mchr</em>, <em class="sig-param">mstart</em>, <em class="sig-param">mend</em>, <em class="sig-param">genome</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">file=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_del"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_del" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+an deletion variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>mstart</strong> (<em>int</em>) – The start coordinate of the deletion.</p></li>
+<li><p><strong>mend</strong> (<em>ind</em>) – The end coordinate of the deletion.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_l, outputs_ref_r, outputs_alt</strong> – Reference allele predictions zooming into the left boundary of the
+deletion,
+Reference allele predictions zooming into the right boundary of the
+deletion,
+Alternative allele predictions zooming into the deletion breakpoint.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_dup">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_dup</code><span class="sig-paren">(</span><em class="sig-param">mchr</em>, <em class="sig-param">mstart</em>, <em class="sig-param">mend</em>, <em class="sig-param">genome</em>, <em class="sig-param">file=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_dup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_dup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+an duplication variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>mstart</strong> (<em>int</em>) – The start coordinate of the duplication.</p></li>
+<li><p><strong>mend</strong> (<em>ind</em>) – The end coordinate of the duplication.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_l, outputs_ref_r, outputs_alt</strong> – Reference allele predictions zooming into the left boundary of the
+duplication,
+Reference allele predictions zooming into the right boundary of the
+duplication,
+Alternative allele predictions zooming into the duplication breakpoint.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_ins">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_ins</code><span class="sig-paren">(</span><em class="sig-param">mchr</em>, <em class="sig-param">mpos</em>, <em class="sig-param">ins_seq</em>, <em class="sig-param">genome</em>, <em class="sig-param">strand='+'</em>, <em class="sig-param">file=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_ins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_ins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+an insertion variant that inserts the specified sequence
+to the insertion site.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>mpos</strong> (<em>int</em>) – The insertion site coordinate.</p></li>
+<li><p><strong>ins_seq</strong> (<em>str</em>) – The inserted sequence in string format.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref, outputs_alt_l, outputs_alt_r</strong> – Reference allele predictions zooming into the insertion site,
+Alternative allele predictions zooming into the left boundary of
+the insertion seqeunce,
+Alternative allele prediction zooming into the right boundary of
+the insertion seqeunce.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_inv">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_inv</code><span class="sig-paren">(</span><em class="sig-param">mchr</em>, <em class="sig-param">mstart</em>, <em class="sig-param">mend</em>, <em class="sig-param">genome</em>, <em class="sig-param">file=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_inv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_inv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+an inversion variant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>mstart</strong> (<em>int</em>) – The start coordinate of the inversion.</p></li>
+<li><p><strong>mend</strong> (<em>ind</em>) – The end coordinate of the inversion.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_l, outputs_ref_r, outputs_alt_l, outputs_alt_r</strong> – Reference allele predictions zooming into the left boundary of the
+inversion,
+Reference allele predictions zooming into the right boundary of the
+inversion,
+Alternative allele predictions zooming into the left boundary of
+the inversion,
+Alternative allele prediction zooming into the right boundary of
+the inversion.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_region">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_region</code><span class="sig-paren">(</span><em class="sig-param">mchr</em>, <em class="sig-param">mstart</em>, <em class="sig-param">mend</em>, <em class="sig-param">genome</em>, <em class="sig-param">file=None</em>, <em class="sig-param">target=True</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+the specified region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mchr</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>mstart</strong> (<em>int</em>) – The start coordinate of the region.</p></li>
+<li><p><strong>mend</strong> (<em>ind</em>) – The end coordinate of the region.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_l, outputs_ref_r, outputs_alt</strong> – Reference allele predictions zooming into the left boundary of the
+duplication,
+Reference allele predictions zooming into the right boundary of the
+duplication,
+Alternative allele predictions zooming into the duplication breakpoint.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_predict.process_single_breakpoint">
+<code class="sig-prename descclassname">orca_predict.</code><code class="sig-name descname">process_single_breakpoint</code><span class="sig-paren">(</span><em class="sig-param">chr1</em>, <em class="sig-param">pos1</em>, <em class="sig-param">chr2</em>, <em class="sig-param">pos2</em>, <em class="sig-param">orientation1</em>, <em class="sig-param">orientation2</em>, <em class="sig-param">genome</em>, <em class="sig-param">target=True</em>, <em class="sig-param">file=None</em>, <em class="sig-param">show_genes=True</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">window_radius=16000000</em>, <em class="sig-param">padding_chr='chr1'</em>, <em class="sig-param">use_cuda=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_predict.html#process_single_breakpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_predict.process_single_breakpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate multiscale genome interaction predictions for
+a simple translocation event that connects
+two chromosomal breakpoints. Specifically, two breakpoint
+positions and the corresponding two orientations are needed.
+The orientations decide how the breakpoints are connected.
+The ‘+’ or ‘-’ sign indicate whether the left or right side of
+the breakpoint is used. For example, for an input
+(‘chr1’, 85691449, ‘chr5’, 89533745 ‘+’, ‘+’), two plus signs
+indicate connecting chr1:0-85691449 with chr5:0-89533745.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chr1</strong> (<em>str</em>) – The chromosome name of the first segment</p></li>
+<li><p><strong>pos1</strong> (<em>int</em>) – The coorindate of breakpoint on the first segment</p></li>
+<li><p><strong>chr2</strong> (<em>str</em>) – The chromosome name of the second segment</p></li>
+<li><p><strong>pos2</strong> (<em>int</em>) – The coorindate of breakpoint on the second segment</p></li>
+<li><p><strong>orientation1</strong> (<em>str</em>) – Indicate which side of the breakpoint should be used for
+the first segment,
+‘+’ indicate the left and ‘-‘ indicate the right side.</p></li>
+<li><p><strong>orientation2</strong> (<em>str</em>) – Indicate which side of the breakpoint should be used for
+the second segment,
+‘+’ indicate the left and ‘-‘ indicate the right side.</p></li>
+<li><p><strong>genome</strong> (<a class="reference internal" href="selene_utils2.html#selene_utils2.MemmapGenome" title="selene_utils2.MemmapGenome"><em>selene_utils2.MemmapGenome</em></a><em> or </em><em>selene_sdk.sequences.Genome</em>) – The reference genome object to extract sequence from</p></li>
+<li><p><strong>target</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, retrieve micro-C data for H1-ESC
+and HFF cells (4DNFI9GMP2J8, 4DNFI643OYP9).</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, generate gene annotation visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, generate chromatin tracks visualization
+file in pdf format that matches the windows of multiscale predictions.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 16000000. The acceptable values are 16000000 which selects
+the 1-32Mb models or 128000000 which selects the 32-256Mb models.</p></li>
+<li><p><strong>padding_chr</strong> (<em>str</em><em>, </em><em>optional</em>) – Default is “chr1”. If window_radius is 128000000, padding is generally
+needed to fill the sequence to 256Mb. The padding sequence will be
+extracted from the padding_chr.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Use CPU if False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outputs_ref_1, outputs_ref_2, outputs_alt</strong> – Reference allele predictions zooming into the chr1 breakpoint,
+Reference allele predictions zooming into the chr2 breakpoint,
+Alternative allele prediction zooming into the junction.
+The returned results are in the format of dictonaries
+containing the prediction outputs and other
+retrieved information. These dictionaries can be directly used as
+input to genomeplot or genomeplot_256Mb. See documentation of <cite>genomepredict</cite> or <cite>genomepredict_256Mb</cite> for
+details of the dictionary content.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, dict, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="orca_utils.html" class="btn btn-neutral float-right" title="orca_utils module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Orca’s API documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

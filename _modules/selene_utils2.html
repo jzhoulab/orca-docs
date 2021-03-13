@@ -1,0 +1,1253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>selene_utils2 &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../orca_predict.html">orca_predict module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_utils.html">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_models.html">orca_models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_modules.html">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>selene_utils2</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selene_utils2</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides the selene-based utilities for training and using </span>
+<span class="sd">Orca sequence models for multiscale genome interaction prediction. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyfaidx</span>
+<span class="kn">from</span> <span class="nn">cooltools.lib.numutils</span> <span class="k">import</span> <span class="n">adaptive_coarsegrain</span>
+<span class="kn">import</span> <span class="nn">cooler</span>
+<span class="kn">import</span> <span class="nn">pyranges</span>
+
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">DataLoader</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">data</span>
+
+
+<span class="kn">from</span> <span class="nn">selene_sdk.sequences</span> <span class="k">import</span> <span class="n">Genome</span>
+<span class="kn">from</span> <span class="nn">selene_sdk.samplers</span> <span class="k">import</span> <span class="n">OnlineSampler</span>
+<span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="k">import</span> <span class="n">get_indices_and_probabilities</span>
+<span class="kn">from</span> <span class="nn">selene_sdk.targets</span> <span class="k">import</span> <span class="n">Target</span>
+
+
+<span class="n">SampleIndices</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;SampleIndices&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;indices&quot;</span><span class="p">,</span> <span class="s2">&quot;weights&quot;</span><span class="p">])</span>
+
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">tabix</span>
+
+
+<div class="viewcode-block" id="MemmapGenome"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome">[docs]</a><span class="k">class</span> <span class="nc">MemmapGenome</span><span class="p">(</span><span class="n">Genome</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Memmapped version of selene.sequence.Genome. Faster for sequence </span>
+<span class="sd">    retrieval by storing all precomputed one-hot encodings in a memmapped </span>
+<span class="sd">    file (~40G for human genome). </span>
+<span class="sd">    </span>
+<span class="sd">    The memmapfile can be an exisiting memmapped file or a path where you </span>
+<span class="sd">    want to create the memmapfile. If the specified memmapfile does not </span>
+<span class="sd">    exist, it will be created the first time you call any method of </span>
+<span class="sd">    MemmapGenome or if MemmapGenome is initialized with `init_unpickable=True`. </span>
+<span class="sd">    Therefore the first call will take some time for the</span>
+<span class="sd">    creation of memmapfile if it does not exist. Also,  if </span>
+<span class="sd">    memmapfile has not been created, be careful not to run multiple</span>
+<span class="sd">    instances of MemmapGenome in parallel (such as with Dataloader), </span>
+<span class="sd">    because as each process will try to create the file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_path : str</span>
+<span class="sd">        Path to an indexed FASTA file, that is, a `*.fasta` file with</span>
+<span class="sd">        a corresponding `*.fai` file in the same directory. This file</span>
+<span class="sd">        should contain the target organism&#39;s genome sequence.</span>
+<span class="sd">    init_unpickleable : bool, optional</span>
+<span class="sd">        Default is False. If False, delay part of initialization code</span>
+<span class="sd">        to executed only when a relevant method is called. This enables</span>
+<span class="sd">        the object to be pickled after instantiation. `init_unpickleable` should</span>
+<span class="sd">        be `False` when used when multi-processing is needed e.g. DataLoader.</span>
+<span class="sd">    memmapfile : str or None, optional</span>
+<span class="sd">        Specify the numpy.memmap file for storing the encoding</span>
+<span class="sd">        of the genome. If memmapfile does not exist, it will be</span>
+<span class="sd">        created when the encoding is requested for the first time.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    genome : pyfaidx.Fasta</span>
+<span class="sd">        The FASTA file containing the genome sequence.</span>
+<span class="sd">    chrs : list(str)</span>
+<span class="sd">        The list of chromosome names.</span>
+<span class="sd">    len_chrs : dict</span>
+<span class="sd">        A dictionary mapping the names of each chromosome in the file to</span>
+<span class="sd">        the length of said chromosome.</span>
+<span class="sd"> </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_path</span><span class="p">,</span>
+        <span class="n">blacklist_regions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bases_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">init_unpickable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">memmapfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">input_path</span><span class="p">,</span>
+            <span class="n">blacklist_regions</span><span class="o">=</span><span class="n">blacklist_regions</span><span class="p">,</span>
+            <span class="n">bases_order</span><span class="o">=</span><span class="n">bases_order</span><span class="p">,</span>
+            <span class="n">init_unpickable</span><span class="o">=</span><span class="n">init_unpickable</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span> <span class="o">=</span> <span class="n">memmapfile</span>
+
+    <span class="k">def</span> <span class="nf">_unpicklable_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genome</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_len_chrs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist_regions</span> <span class="o">==</span> <span class="s2">&quot;hg19&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                    <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+                        <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span> <span class="s2">&quot;sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist_regions</span> <span class="o">==</span> <span class="s2">&quot;hg38&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                    <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+                        <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span> <span class="s2">&quot;sequences/data/hg38.blacklist.bed.gz&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist_regions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># user-specified file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">blacklist_regions</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inds</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">c</span><span class="p">:</span> <span class="n">ind</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chrs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lens</span><span class="p">)]))</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span><span class="p">):</span>
+                <span class="c1"># load memmap file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># convert all sequences into encoding</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lens</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span><span class="p">:</span>
+                    <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">c</span><span class="p">][:]</span><span class="o">.</span><span class="n">seq</span>
+                    <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="p">[</span>
+                        <span class="p">:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="n">encoding</span><span class="o">.</span><span class="n">T</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># create memmap file</span>
+                    <span class="n">mmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w+&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="p">)</span>
+                    <span class="n">mmap</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">memmap</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">memmapfile</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="MemmapGenome.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># delay initlization to allow  multiprocessing</span>
+        <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unpicklable_init</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dfunc</span></div>
+
+<div class="viewcode-block" id="MemmapGenome.get_encoding_from_coords"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome.get_encoding_from_coords">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">get_encoding_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
+<span class="sd">        queried coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosome or region, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the first position in the</span>
+<span class="sd">            sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is</span>
+<span class="sd">            treated as &#39;+&#39;.</span>
+<span class="sd">        pad : bool, optional</span>
+<span class="sd">            Default is `False`. Pad the output sequence with &#39;N&#39; if `start`</span>
+<span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
+<span class="sd">            `end - start`.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray, dtype=numpy.float32</span>
+<span class="sd">            The :math:`L \\times 4` encoding of the sequence, where</span>
+<span class="sd">            :math:`L = end - start`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AssertionError</span>
+<span class="sd">            If it cannot retrieve encoding that matches the length `L = end - start`</span>
+<span class="sd">            such as when end &gt; chromosome length and pad=False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pad</span><span class="p">:</span>
+            <span class="c1"># padding with 0.25 if coordinates extend beyond chr boundary</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
+                <span class="n">pad_right</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
+                <span class="n">qend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">qend</span> <span class="o">=</span> <span class="n">end</span>
+                <span class="n">pad_right</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">pad_left</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="n">qstart</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pad_left</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">qstart</span> <span class="o">=</span> <span class="n">start</span>
+
+            <span class="n">encoding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="n">pad_left</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="n">qstart</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="n">qend</span><span class="p">],</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="n">pad_right</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">end</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">and</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_data</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="n">start</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inds</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="n">end</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+            <span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">T</span></div>
+
+<div class="viewcode-block" id="MemmapGenome.get_encoding_from_coords_check_unk"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome.get_encoding_from_coords_check_unk">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">get_encoding_from_coords_check_unk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
+<span class="sd">        queried coordinates and check whether the sequence contains</span>
+<span class="sd">        unknown base(s).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosome or region, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the first position in the</span>
+<span class="sd">            sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is</span>
+<span class="sd">            treated as &#39;+&#39;.</span>
+<span class="sd">        pad : bool, optional</span>
+<span class="sd">            Default is `False`. Pad the output sequence with &#39;N&#39; if `start`</span>
+<span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
+<span class="sd">            `end - start`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple(numpy.ndarray, bool)</span>
+<span class="sd">            * `tuple[0]` is the :math:`L \\times 4` encoding of the sequence, where</span>
+<span class="sd">            :math:`L = end - start`.</span>
+<span class="sd">            `L` = 0 for the NumPy array returned.</span>
+<span class="sd">            * `tuple[1]` is the boolean value that indicates whether the</span>
+<span class="sd">            sequence contains any unknown base(s) specified in self.UNK_BASE</span>
+
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AssertionError</span>
+<span class="sd">            If it cannot retrieve encoding that matches the length `L = end - start`</span>
+<span class="sd">            such as when end &gt; chromosome length and pad=False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="n">strand</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoding</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">encoding</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">==</span> <span class="mf">0.25</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_adaptive_coarsegrain</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">countar</span><span class="p">,</span> <span class="n">max_levels</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper for cooltools adaptive coarse-graining to add support </span>
+<span class="sd">    for non-square input for interchromosomal predictions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ar</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">countar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">9</span> <span class="ow">and</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="n">ar_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+        <span class="n">ar_padded</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ar_padded</span><span class="p">[:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ar</span>
+
+        <span class="n">countar_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+        <span class="n">countar_padded</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">countar_padded</span><span class="p">[:</span> <span class="n">countar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span> <span class="n">countar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">countar</span>
+        <span class="k">return</span> <span class="n">adaptive_coarsegrain</span><span class="p">(</span><span class="n">ar_padded</span><span class="p">,</span> <span class="n">countar_padded</span><span class="p">,</span> <span class="n">max_levels</span><span class="o">=</span><span class="n">max_levels</span><span class="p">)[</span>
+            <span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">adaptive_coarsegrain</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">countar</span><span class="p">,</span> <span class="n">max_levels</span><span class="o">=</span><span class="n">max_levels</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">padding</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">adaptive_coarsegrain</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">ar</span><span class="p">,</span> <span class="n">padding</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">countar</span><span class="p">,</span> <span class="n">padding</span><span class="p">]),</span> <span class="n">max_levels</span><span class="o">=</span><span class="n">max_levels</span>
+        <span class="p">)[:,</span> <span class="p">:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">elif</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">padding</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">adaptive_coarsegrain</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ar</span><span class="p">,</span> <span class="n">padding</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">countar</span><span class="p">,</span> <span class="n">padding</span><span class="p">]),</span> <span class="n">max_levels</span><span class="o">=</span><span class="n">max_levels</span>
+        <span class="p">)[:</span> <span class="n">ar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span>
+
+
+<div class="viewcode-block" id="Genomic2DFeatures"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.Genomic2DFeatures">[docs]</a><span class="k">class</span> <span class="nc">Genomic2DFeatures</span><span class="p">(</span><span class="n">Target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores one or multple datasets of Hi-C style 2D data in cooler format.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_paths : list(str)</span>
+<span class="sd">        List of paths to the Cooler datasets. For mcool files, </span>
+<span class="sd">        the path should include the resolution. Please refer to </span>
+<span class="sd">        cooler.Cooler documentation for support of mcool files.</span>
+<span class="sd">    features : list(str)</span>
+<span class="sd">        The list of dataset names that should match the `input_path`.</span>
+<span class="sd">    shape : tuple(int, int)</span>
+<span class="sd">        The shape of the output array (# of bins by # of bins).</span>
+<span class="sd">    cg : bool, optional</span>
+<span class="sd">        If `yes`, adpative coarse-graining is applied to the output.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list(cooler.Cooler)</span>
+<span class="sd">        The list of Cooler objects for the cooler files.</span>
+<span class="sd">    n_features : int</span>
+<span class="sd">        The number of cooler files.</span>
+<span class="sd">    feature_index_dict : dict</span>
+<span class="sd">        A dictionary mapping feature names (`str`) to indices (`int`),</span>
+<span class="sd">        where the index is the position of the feature in `features`.</span>
+<span class="sd">    shape : tuple(int, int)</span>
+<span class="sd">        The shape of the output array (# of bins by # of bins).</span>
+<span class="sd">    cg : bool</span>
+<span class="sd">        Whether adpative coarse-graining is applied to the output.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_paths</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">cg</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a new `Genomic2DFeatures` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_paths</span> <span class="o">=</span> <span class="n">input_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">feat</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cg</span> <span class="o">=</span> <span class="n">cg</span>
+
+<div class="viewcode-block" id="Genomic2DFeatures.get_feature_data"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.Genomic2DFeatures.get_feature_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">chrom2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">cooler</span><span class="o">.</span><span class="n">Cooler</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_paths</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="k">if</span> <span class="n">chrom2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span> <span class="p">(</span><span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cg</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">_adaptive_coarsegrain</span><span class="p">(</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="o">*</span><span class="n">query</span><span class="p">),</span> <span class="n">c</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="o">*</span><span class="n">query</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="o">*</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="MultibinGenomicFeatures"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MultibinGenomicFeatures">[docs]</a><span class="k">class</span> <span class="nc">MultibinGenomicFeatures</span><span class="p">(</span><span class="n">Target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Multibin version of selene.targets.GenomicFeatures</span>
+<span class="sd">    Stores the dataset specifying features for genomic regions.</span>
+<span class="sd">    Accepts a `*.bed` file with the following columns,</span>
+<span class="sd">    in order:</span>
+<span class="sd">    ::</span>
+<span class="sd">        [chrom, start, end, strand, feature]</span>
+<span class="sd">    `start` and `end` is 0-based as in bed file format. </span>
+<span class="sd">    </span>
+<span class="sd">    Note that unlike selene_sdk.targets.GenomicFeatures which queries </span>
+<span class="sd">    the tabix data file out-of-core, MultibinGenomicFeatures requires </span>
+<span class="sd">    more memory as it loads the entire bed file in memory as a pyranges </span>
+<span class="sd">    table for higher query speed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_path : str</span>
+<span class="sd">        Path to the bed file.</span>
+<span class="sd">    features : list(str)</span>
+<span class="sd">        The non-redundant list of genomic features names. The output array</span>
+<span class="sd">        will have the same feature order as specified in this list.</span>
+<span class="sd">    bin_size : int</span>
+<span class="sd">        The length of the bin(s) in which we check for features</span>
+<span class="sd">    step_size : int</span>
+<span class="sd">        The interval between two adjacent bins.</span>
+<span class="sd">    shape : tuple(int, int)</span>
+<span class="sd">        The shape of the output array (n_features by n_bins).</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        For `mode==&#39;any&#39;`, any overlap will get 1, and no overlap will get 0.</span>
+<span class="sd">        For `mode==&#39;center&#39;, only overlap with the center basepair of each bin</span>
+<span class="sd">        will get 1, otherwise 0. </span>
+<span class="sd">        For `mode==&#39;proportion&#39;`, the proportion of overlap will be returned.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pyranges.PyRanges</span>
+<span class="sd">        The data stored in PyRanges object.</span>
+<span class="sd">    n_features : int</span>
+<span class="sd">        The number of distinct features.</span>
+<span class="sd">    feature_index_dict : dict</span>
+<span class="sd">        A dictionary mapping feature names (`str`) to indices (`int`),</span>
+<span class="sd">        where the index is the position of the feature in `features`.</span>
+<span class="sd">    index_feature_dict : dict</span>
+<span class="sd">        A dictionary mapping indices (`int`) to feature names (`str`),</span>
+<span class="sd">        where the index is the position of the feature in the input</span>
+<span class="sd">        features.</span>
+<span class="sd">    bin_size : int</span>
+<span class="sd">        The length of the bin(s) in which we check for features</span>
+<span class="sd">    step_size : int</span>
+<span class="sd">        The interval between two adjacent bins.</span>
+<span class="sd">    shape : tuple(int, int)</span>
+<span class="sd">        The shape of the output array (n_features by n_bins).</span>
+<span class="sd">    mode : str</span>
+<span class="sd">        - For `mode==&#39;any&#39;`, any overlap will get assigned 1, and no overlap will </span>
+<span class="sd">        get assigned 0.</span>
+<span class="sd">        - For `mode==&#39;center&#39;, only overlap with the center basepair of each bin</span>
+<span class="sd">        will get assigned 1, otherwise assigned 0. </span>
+<span class="sd">        - For `mode==&#39;proportion&#39;`, the proportion of overlap will be assigned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">bin_size</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a new `MultibinGenomicFeatures` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">feat</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">)])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_feature_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span> <span class="o">=</span> <span class="n">bin_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="MultibinGenomicFeatures.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MultibinGenomicFeatures.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># delay initlization to allow multiprocessing (not necessary here</span>
+        <span class="c1"># but kept for consistency)</span>
+        <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pyranges</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dfunc</span></div>
+
+<div class="viewcode-block" id="MultibinGenomicFeatures.get_feature_data"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MultibinGenomicFeatures.get_feature_data">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a genomic region specified, return a `number of features` </span>
+<span class="sd">        by `number of bins` array for overlap of each genomic bin and </span>
+<span class="sd">        each feature. How the overlap is quantified depends on the </span>
+<span class="sd">        `mode` attribute specified during initialization. </span>
+
+<span class="sd">        For `mode==&#39;any&#39;`, any overlap will get assigned 1, and no overlap will </span>
+<span class="sd">        get assigned 0.</span>
+<span class="sd">        For `mode==&#39;center&#39;, only overlap with the center basepair of each bin</span>
+<span class="sd">        will get assigned 1, otherwise assigned 0. </span>
+<span class="sd">        For `mode==&#39;proportion&#39;`, the proportion of overlap will be assigned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the region (e.g. &#39;1&#39;, &#39;2&#39;, ..., &#39;X&#39;, &#39;Y&#39;).</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based first position in the region.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the region.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            :math:`L \\times N` array, where :math:`L = ``number of bins`</span>
+<span class="sd">            and :math:`N =` `self.n_features`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">pyranges</span><span class="o">.</span><span class="n">PyRanges</span><span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">Chromosome</span><span class="o">=</span><span class="n">chrom</span><span class="p">,</span>
+                        <span class="n">Start</span><span class="o">=</span><span class="n">start</span>
+                        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="n">End</span><span class="o">=</span><span class="n">start</span>
+                        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span> <span class="o">/</span> <span class="mi">2</span>
+                        <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">Index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_bins</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">pyranges</span><span class="o">.</span><span class="n">PyRanges</span><span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">Chromosome</span><span class="o">=</span><span class="n">chrom</span><span class="p">,</span>
+                        <span class="n">Start</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">End</span><span class="o">=</span><span class="n">start</span>
+                        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">,</span>
+                        <span class="n">Index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_bins</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rows_featurename</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+            <span class="n">rows_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;proportion&quot;</span><span class="p">:</span>
+                <span class="n">rows_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">Start</span><span class="p">)</span>
+                <span class="n">rows_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">End</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)):</span>
+                    <span class="n">targets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span><span class="p">[</span><span class="n">rows_featurename</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">rows_index</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="n">rows_end</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">rows_start</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)):</span>
+                    <span class="n">targets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span><span class="p">[</span><span class="n">rows_featurename</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">rows_index</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">targets</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RandomPositionsSamplerHiC"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.RandomPositionsSamplerHiC">[docs]</a><span class="k">class</span> <span class="nc">RandomPositionsSamplerHiC</span><span class="p">(</span><span class="n">OnlineSampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This sampler randomly selects a region in the genome and retrieves</span>
+<span class="sd">    sequence and relevant Hi-C and optionally multibin genomic </span>
+<span class="sd">     data from that region. This implementation</span>
+<span class="sd">     is modified based on selene_sdk.samplers.RandomPositionSampler.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Genome</span>
+<span class="sd">        A genome to retrieve sequence from.</span>
+<span class="sd">    target : Genomic2DFeatures</span>
+<span class="sd">        Genomic2DFeatures object that loads the cooler files. </span>
+<span class="sd">    features : list(str)</span>
+<span class="sd">        List of names that correspond to the cooler files.</span>
+<span class="sd">    target_1d : MultibinGenomicFeatures or None, optional</span>
+<span class="sd">        MultibinGenomicFeatures object that loads 1D genomic feature data.</span>
+<span class="sd">    background_cis_file : str or None, optional</span>
+<span class="sd">        Path to the numpy file that stores the distance-based </span>
+<span class="sd">        expected background balanced scores for cis-interactions. If </span>
+<span class="sd">        specified with background_trans_file, the sampler will</span>
+<span class="sd">        return corresponding background array that matches with</span>
+<span class="sd">        the 2D feature retrieved.</span>
+<span class="sd">    background_trans_file : str or None, optional</span>
+<span class="sd">        Path to the numpy file that stores the expected background </span>
+<span class="sd">        balanced scores for trans-interactions. See doc for</span>
+<span class="sd">        `background_cis_file` for more detail.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Default is 436. Sets the random seed for sampling.</span>
+<span class="sd">    validation_holdout : list(str), optional</span>
+<span class="sd">        Default is `[&#39;chr6&#39;, &#39;chr7&#39;]`. Holdout can be regional or</span>
+<span class="sd">        proportional. If regional, expects a list (e.g. `[&#39;chrX&#39;, &#39;chrY&#39;]`).</span>
+<span class="sd">        Regions must match those specified in the first column of the</span>
+<span class="sd">        tabix-indexed BED file. If proportional, specify a percentage</span>
+<span class="sd">        between (0.0, 1.0). Typically 0.10 or 0.20.</span>
+<span class="sd">    test_holdout : list(str), optional</span>
+<span class="sd">        Default is `[&#39;chr8&#39;, &#39;chr9&#39;]`. See documentation for</span>
+<span class="sd">        `validation_holdout` for additional information.</span>
+<span class="sd">    sequence_length : int, optional</span>
+<span class="sd">        Default is 1000000. Model is trained on sequences of size </span>
+<span class="sd">        `sequence_length` where genomic features are retreived</span>
+<span class="sd">        for the same regions as the sequences.</span>
+<span class="sd">    max_seg_length : int or None, optional</span>
+<span class="sd">        Default is None. If specified and cross_chromosome is True, </span>
+<span class="sd">        bound the maximum length of each sequence segment. </span>
+<span class="sd">    length_schedule : list(float, list(int, int)) or None, optional</span>
+<span class="sd">        Default is None. If specified and cross_chromosome is True, </span>
+<span class="sd">        decide the sequence segment length to sample according to the </span>
+<span class="sd">        length schedule (before trimming to fit in the sequence length).</span>
+<span class="sd">        The length schedule is in the format of `[p, [min_len, max_len]]`,</span>
+<span class="sd">        which means, with probability `p`, decide the length by randomly</span>
+<span class="sd">        sampling an integer between `min_len` and `max_len`, and retrieve</span>
+<span class="sd">        the maximal remaining length as default with probability `1-p`.</span>
+<span class="sd">    position_resolution : int, optional</span>
+<span class="sd">        Default is 1. Preprocess the sampled start position by</span>
+<span class="sd">        `start = start - start % position_resolution`. Useful for binned</span>
+<span class="sd">        data.</span>
+<span class="sd">    random_shift : int, optional</span>
+<span class="sd">        Default is 0. Shift the coordinates to retrieve </span>
+<span class="sd">        sequence by a random integer in the range of [-random_shift, random_shift).</span>
+<span class="sd">    random_strand : bool, optional</span>
+<span class="sd">        Default is True. If True, randomly select the strand of the </span>
+<span class="sd">        sequence, otherwise alway use the &#39;+&#39; strand.</span>
+<span class="sd">    cross_chromosome : bool, optional</span>
+<span class="sd">        Default is True. If True, allows sampling multiple segments of </span>
+<span class="sd">        sequences and the corresponding features. The default is sampling</span>
+<span class="sd">        the maximum length allowed by sequence_length, thus multiple segments</span>
+<span class="sd">        will only be sampled if `sequence_length` is larger than the minimum </span>
+<span class="sd">        chromosome length or when max_seg_length and length_schedule is specified</span>
+<span class="sd">        to limit the sequence segment length.</span>
+<span class="sd">    permute_segments : bool, optional</span>
+<span class="sd">        Default is False. If True, permute the order of segments when</span>
+<span class="sd">        multiple segments are sampled.</span>
+<span class="sd">    mode : {&#39;train&#39;, &#39;validate&#39;, &#39;test&#39;}</span>
+<span class="sd">        Default is `&#39;train&#39;`. The mode to run the sampler in.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Genome</span>
+<span class="sd">        A genome to retrieve sequence from.</span>
+<span class="sd">    target : selene_sdk.targets.Target</span>
+<span class="sd">        The `selene_sdk.targets.Target` object holding the features that we</span>
+<span class="sd">        would like to predict.</span>
+<span class="sd">    target_1d : MultibinGenomicFeatures or None, optional</span>
+<span class="sd">        MultibinGenomicFeatures object that loads 1D genomic feature data.</span>
+<span class="sd">    background_cis : numpy.ndarray</span>
+<span class="sd">        One-dimensional numpy.ndarray that stores the distance-based </span>
+<span class="sd">        expected background balanced scores for cis-interactions. </span>
+<span class="sd">    background_trans : float</span>
+<span class="sd">        The expected background balanced score for trans-interactions.</span>
+<span class="sd">    bg : bool</span>
+<span class="sd">        Whether the sample will retrieve background arrays.</span>
+<span class="sd">    validation_holdout : list(str)</span>
+<span class="sd">        The samples to hold out for validating model performance. These</span>
+<span class="sd">        can be &quot;regional&quot; or &quot;proportional&quot;. If regional, this is a list</span>
+<span class="sd">        of region names (e.g. `[&#39;chrX&#39;, &#39;chrY&#39;]`). These regions must</span>
+<span class="sd">        match those specified in the first column of the tabix-indexed</span>
+<span class="sd">        BED file. If proportional, this is the fraction of total samples</span>
+<span class="sd">        that will be held out.</span>
+<span class="sd">    test_holdout : list(str) </span>
+<span class="sd">        The samples to hold out for testing model performance. See the</span>
+<span class="sd">        documentation for `validation_holdout` for more details.</span>
+<span class="sd">    sequence_length : int</span>
+<span class="sd">        Model is trained on sequences of size </span>
+<span class="sd">        `sequence_length` where genomic features are retreived</span>
+<span class="sd">        for the same regions as the sequences.</span>
+<span class="sd">    max_seg_length : int or None</span>
+<span class="sd">        Default is None. If specified and cross_chromosome is True, </span>
+<span class="sd">        bound the maximum length of each sequence segment. </span>
+<span class="sd">    length_schedule : list(float, list(int, int)) or None</span>
+<span class="sd">        Default is None. If specified and cross_chromosome is True, </span>
+<span class="sd">        decide the sequence segment length to sample according to the </span>
+<span class="sd">        length schedule (before trimming to fit in the sequence length).</span>
+<span class="sd">        The length schedule is in the format of `[p, [min_len, max_len]]`,</span>
+<span class="sd">        which means, with probability `p`, decide the length by randomly</span>
+<span class="sd">        sampling an integer between `min_len` and `max_len`, and retrieve</span>
+<span class="sd">        the maximal remaining length as default with probability `1-p`.</span>
+<span class="sd">    position_resolution : int</span>
+<span class="sd">        Default is 1. Preprocess the sampled start position by</span>
+<span class="sd">        `start = start - start % position_resolution`. Useful for binned</span>
+<span class="sd">        data.</span>
+<span class="sd">    random_shift : int</span>
+<span class="sd">        Default is 0. Shift the coordinates to retrieve </span>
+<span class="sd">        sequence by a random integer in the range of [-random_shift, random_shift).</span>
+<span class="sd">    random_strand : bool</span>
+<span class="sd">        Default is True. If True, randomly select the strand of the </span>
+<span class="sd">        sequence, otherwise alway use the &#39;+&#39; strand.</span>
+<span class="sd">    cross_chromosome : bool</span>
+<span class="sd">        Default is True. If True, allows sampling multiple segments of </span>
+<span class="sd">        sequences and the corresponding features. The default is sampling</span>
+<span class="sd">        the maximum length allowed by sequence_length, thus multiple segments</span>
+<span class="sd">        will only be sampled if `sequence_length` is larger than the minimum </span>
+<span class="sd">        chromosome length or when max_seg_length and length_schedule is specified</span>
+<span class="sd">        to limit the sequence segment length.</span>
+<span class="sd">    permute_segments : bool</span>
+<span class="sd">        Default is False. If True, permute the order of segments when</span>
+<span class="sd">        multiple segments are sampled.</span>
+<span class="sd">    modes : list(str)</span>
+<span class="sd">        The list of modes that the sampler can be run in.</span>
+<span class="sd">    mode : str</span>
+<span class="sd">        The current mode that the sampler is running in. Must be one of</span>
+<span class="sd">        the modes listed in `modes`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reference_sequence</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">,</span>
+        <span class="n">features</span><span class="p">,</span>
+        <span class="n">target_1d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">background_cis_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">background_trans_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="mi">436</span><span class="p">,</span>
+        <span class="n">validation_holdout</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chr6&quot;</span><span class="p">,</span> <span class="s2">&quot;chr7&quot;</span><span class="p">],</span>
+        <span class="n">test_holdout</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chr8&quot;</span><span class="p">,</span> <span class="s2">&quot;chr9&quot;</span><span class="p">],</span>
+        <span class="n">sequence_length</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span>
+        <span class="n">max_seg_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">length_schedule</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">position_resolution</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">random_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">random_strand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cross_chromosome</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">permute_segments</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RandomPositionsSamplerHiC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">reference_sequence</span><span class="p">,</span>
+            <span class="n">target</span><span class="p">,</span>
+            <span class="n">features</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">validation_holdout</span><span class="o">=</span><span class="n">validation_holdout</span><span class="p">,</span>
+            <span class="n">test_holdout</span><span class="o">=</span><span class="n">test_holdout</span><span class="p">,</span>
+            <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
+            <span class="n">center_bin_to_predict</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;sample_next&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_resolution</span> <span class="o">=</span> <span class="n">position_resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_shift</span> <span class="o">=</span> <span class="n">random_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_strand</span> <span class="o">=</span> <span class="n">random_strand</span>
+        <span class="k">if</span> <span class="n">background_cis_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">background_trans_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">background_cis_file</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">background_trans_file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bg</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bg</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_seg_length</span> <span class="o">=</span> <span class="n">max_seg_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span> <span class="o">=</span> <span class="n">length_schedule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span> <span class="o">=</span> <span class="n">target_1d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_chromosome</span> <span class="o">=</span> <span class="n">cross_chromosome</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">permute_segments</span> <span class="o">=</span> <span class="n">permute_segments</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_holdout</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RandomPositionsSamplerHiC.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.RandomPositionsSamplerHiC.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># delay initlization to allow  multiprocessing</span>
+        <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_chromosome</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dfunc</span></div>
+
+    <span class="k">def</span> <span class="nf">_partition_genome_by_chromosome</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">SampleIndices</span><span class="p">([],</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">len_chrom</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_chr_lens</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span> <span class="ow">and</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len_chrom</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">len_chrom</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+            <span class="n">sample_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span>
+            <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">get_indices_and_probabilities</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="p">,</span> <span class="n">sample_indices</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_retrieve_multi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">):</span>
+        <span class="n">retrieved_seqs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+            <span class="n">retrieved_1ds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_shift</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">random_shift</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_shift</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">retrieved_seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">retrieved_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                <span class="n">retrieved_1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="o">.</span><span class="n">get_feature_data</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                    <span class="n">retrieved_1d</span> <span class="o">=</span> <span class="n">retrieved_1d</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">retrieved_1ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">retrieved_1d</span><span class="p">)</span>
+
+        <span class="n">retrieved_targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+            <span class="n">background_targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">):</span>
+            <span class="n">retrieved_targets_row</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                <span class="n">background_targets_row</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="p">,</span> <span class="n">strand2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">):</span>
+                <span class="n">retrieved_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">get_feature_data</span><span class="p">(</span>
+                    <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">chrom2</span><span class="o">=</span><span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="o">=</span><span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="o">=</span><span class="n">end2</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">chrom2</span> <span class="o">!=</span> <span class="n">chrom</span><span class="p">:</span>
+                        <span class="n">background_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">retrieved_target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_trans</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">binsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="n">retrieved_target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">acoor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">retrieved_target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">bcoor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="p">,</span> <span class="n">retrieved_target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">background_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_cis</span><span class="p">[</span>
+                            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">acoor</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">bcoor</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="n">binsize</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                        <span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                    <span class="n">retrieved_target</span> <span class="o">=</span> <span class="n">retrieved_target</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                        <span class="n">background_target</span> <span class="o">=</span> <span class="n">background_target</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="k">if</span> <span class="n">strand2</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                    <span class="n">retrieved_target</span> <span class="o">=</span> <span class="n">retrieved_target</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                        <span class="n">background_target</span> <span class="o">=</span> <span class="n">background_target</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">retrieved_targets_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">retrieved_target</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                    <span class="n">background_targets_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">background_target</span><span class="p">)</span>
+            <span class="n">retrieved_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">retrieved_targets_row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                <span class="n">background_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">background_targets_row</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seqs</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">,</span> <span class="n">background_targets</span><span class="p">,</span> <span class="n">retrieved_1ds</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seqs</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">,</span> <span class="n">background_targets</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seqs</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">,</span> <span class="n">retrieved_1ds</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seqs</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_randcache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="mi">200000</span><span class="p">,</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="RandomPositionsSamplerHiC.sample"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.RandomPositionsSamplerHiC.sample">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordinate_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Randomly draws a mini-batch of examples and their corresponding</span>
+<span class="sd">        labels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_size : int, optional</span>
+<span class="sd">            Default is 1. The number of examples to include in the</span>
+<span class="sd">            mini-batch.</span>
+<span class="sd">        mode : str, optional</span>
+<span class="sd">            Default is None. The operating mode that the object should run in.</span>
+<span class="sd">            If None, will use the current mode `self.mode`.</span>
+<span class="sd">        coordinate_only : bool, optional</span>
+<span class="sd">            Default is False. If True, only return the coordinates. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sequences, targets, ...: tuple(numpy.ndarray, numpy.ndarray, ...)</span>
+<span class="sd">            A tuple containing the numeric representation of the</span>
+<span class="sd">            sequence examples, their corresponding 2D targets, and optionally 1D targets</span>
+<span class="sd">            (if target_1d were specified) and background</span>
+<span class="sd">            matrices (if background_cis_file and background_trans_file were </span>
+<span class="sd">            specified). The shape of `sequences` will be</span>
+<span class="sd">            :math:`B \\times L \\times N`, where :math:`B` is</span>
+<span class="sd">            `batch_size`, :math:`L` is the sequence length, and</span>
+<span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet.</span>
+<span class="sd">            The shape of `targets` will be :math:`B \\times M \\times M`,</span>
+<span class="sd">            where :math:`M \\times M` is target.shape. The shape of 1D targets</span>
+<span class="sd">            is :math:`B \\times K \\times F`, where :math:`K = ``number of bins`</span>
+<span class="sd">            and :math:`F =` `self.n_features`. The shape of background matrices</span>
+<span class="sd">            are the same as `targets`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span> <span class="k">if</span> <span class="n">mode</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">coordinate_only</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                <span class="n">normmats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                <span class="n">target_1ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="n">n_samples_drawn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">allcoords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">n_samples_drawn</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
+            <span class="n">current_length</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">chroms</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">ends</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">strands</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="n">current_length</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chroms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_chromosome</span><span class="p">:</span>
+                    <span class="n">sample_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">sample_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">()</span>
+                        <span class="n">sample_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="n">rand_interval_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">][</span><span class="n">sample_index</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="n">chrom</span><span class="p">,</span> <span class="n">cstart</span><span class="p">,</span> <span class="n">cend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="p">[</span><span class="n">rand_interval_index</span><span class="p">]</span>
+
+                <span class="n">next_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">-</span> <span class="n">current_length</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_chromosome</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">next_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fmin</span><span class="p">(</span>
+                            <span class="n">next_length</span><span class="p">,</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_seg_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_chromosome</span><span class="p">:</span>
+                    <span class="n">next_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fmin</span><span class="p">(</span><span class="n">next_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_seg_length</span><span class="p">)</span>
+
+                <span class="n">start_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cstart</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">fmax</span><span class="p">(</span><span class="n">cstart</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cend</span> <span class="o">-</span> <span class="n">next_length</span><span class="p">))</span>
+                <span class="n">start_position</span> <span class="o">-=</span> <span class="n">start_position</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_resolution</span>
+
+                <span class="k">if</span> <span class="n">start_position</span> <span class="o">+</span> <span class="n">next_length</span> <span class="o">&gt;</span> <span class="n">cend</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cross_chromosome</span>
+                        <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_schedule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_seg_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="p">):</span>
+                        <span class="n">end_position</span> <span class="o">=</span> <span class="n">cend</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">end_position</span> <span class="o">=</span> <span class="n">start_position</span> <span class="o">+</span> <span class="n">next_length</span>
+
+                <span class="n">end_position</span> <span class="o">-=</span> <span class="n">end_position</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_resolution</span>
+                <span class="k">if</span> <span class="n">end_position</span> <span class="o">==</span> <span class="n">start_position</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">coords_in_bounds</span><span class="p">(</span>
+                    <span class="n">chrom</span><span class="p">,</span> <span class="n">start_position</span><span class="p">,</span> <span class="n">end_position</span>
+                <span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="n">current_length</span> <span class="o">+=</span> <span class="n">end_position</span> <span class="o">-</span> <span class="n">start_position</span>
+                <span class="n">chroms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span>
+                <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_position</span><span class="p">)</span>
+                <span class="n">ends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_position</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_strand</span><span class="p">:</span>
+                    <span class="n">strand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRAND_SIDES</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">strand</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+                <span class="n">strands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strand</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_segments</span><span class="p">:</span>
+                <span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chroms</span><span class="p">)))</span>
+                <span class="n">chroms</span> <span class="o">=</span> <span class="p">[</span><span class="n">chroms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perm</span><span class="p">]</span>
+                <span class="n">starts</span> <span class="o">=</span> <span class="p">[</span><span class="n">starts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perm</span><span class="p">]</span>
+                <span class="n">ends</span> <span class="o">=</span> <span class="p">[</span><span class="n">ends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perm</span><span class="p">]</span>
+                <span class="n">strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">strands</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perm</span><span class="p">]</span>
+
+            <span class="n">allcoords</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">])</span>
+            <span class="n">n_samples_drawn</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">allcoords</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">coordinate_only</span><span class="p">:</span>
+                <span class="n">retrieve_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_multi</span><span class="p">(</span><span class="n">chroms</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">strands</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                        <span class="n">seq</span><span class="p">,</span> <span class="n">seq_targets</span><span class="p">,</span> <span class="n">seq_background</span><span class="p">,</span> <span class="n">seq_target_1ds</span> <span class="o">=</span> <span class="n">retrieve_output</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">seq</span><span class="p">,</span> <span class="n">seq_targets</span><span class="p">,</span> <span class="n">seq_background</span> <span class="o">=</span> <span class="n">retrieve_output</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                        <span class="n">seq</span><span class="p">,</span> <span class="n">seq_targets</span><span class="p">,</span> <span class="n">seq_target_1ds</span> <span class="o">=</span> <span class="n">retrieve_output</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">seq</span><span class="p">,</span> <span class="n">seq_targets</span> <span class="o">=</span> <span class="n">retrieve_output</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">sequences</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">seq</span>
+                    <span class="n">targets</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">seq_targets</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                        <span class="n">normmats</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">seq_background</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                        <span class="n">target_1ds</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">seq_target_1ds</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+                        <span class="n">sequences</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">s</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">seq_target_1ds</span><span class="p">:</span>
+                            <span class="n">target_1ds</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">t</span>
+                            <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                    <span class="n">offsetx</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">seq_targets</span><span class="p">:</span>
+                        <span class="n">offsety</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                            <span class="n">targets</span><span class="p">[</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">offsetx</span> <span class="p">:</span> <span class="n">offsetx</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offsety</span> <span class="p">:</span> <span class="n">offsety</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                            <span class="n">offsety</span> <span class="o">=</span> <span class="n">offsety</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">offsetx</span> <span class="o">=</span> <span class="n">offsetx</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">assert</span> <span class="n">offsetx</span> <span class="o">==</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">assert</span> <span class="n">offsety</span> <span class="o">==</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                        <span class="n">offsetx</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">seq_background</span><span class="p">:</span>
+                            <span class="n">offsety</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                                <span class="n">normmats</span><span class="p">[</span>
+                                    <span class="n">i</span><span class="p">,</span>
+                                    <span class="n">offsetx</span> <span class="p">:</span> <span class="n">offsetx</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">offsety</span> <span class="p">:</span> <span class="n">offsety</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                                <span class="n">offsety</span> <span class="o">=</span> <span class="n">offsety</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="n">offsetx</span> <span class="o">=</span> <span class="n">offsetx</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">assert</span> <span class="n">offsetx</span> <span class="o">==</span> <span class="n">normmats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">assert</span> <span class="n">offsety</span> <span class="o">==</span> <span class="n">normmats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">coordinate_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">allcoords</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">normmats</span><span class="p">,</span> <span class="n">target_1ds</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">normmats</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_1d</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">target_1ds</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

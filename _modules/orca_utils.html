@@ -1,0 +1,1438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>orca_utils &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../orca_predict.html">orca_predict module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_utils.html">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_models.html">orca_models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orca_modules.html">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>orca_utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for orca_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the utilities for Orca-based applications,</span>
+<span class="sd">including a class for structural variants and plotting utilities.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">bisect</span> <span class="k">import</span> <span class="n">bisect</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_pdf</span> <span class="k">import</span> <span class="n">PdfPages</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">colormaps</span> <span class="k">import</span> <span class="n">hnh_cmap_ext5</span><span class="p">,</span> <span class="n">bwcmap</span>
+
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;pdf.fonttype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ps.fonttype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="n">ORCA_PATH</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">linestart</span><span class="p">,</span> <span class="n">lineend</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">matlen</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="p">[</span><span class="o">-</span><span class="n">matlen</span> <span class="o">/</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="n">matlen</span> <span class="o">/</span> <span class="mi">50</span><span class="p">],</span>
+        <span class="p">[</span><span class="n">matlen</span> <span class="o">*</span> <span class="n">linestart</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">,</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">lineend</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">],</span>
+        <span class="n">solid_capstyle</span><span class="o">=</span><span class="s2">&quot;butt&quot;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">linepos</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">matlen</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;double&quot;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">/</span> <span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+            <span class="p">[(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">-</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">/</span> <span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+            <span class="p">[(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">+</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">/</span> <span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span>
+            <span class="p">[(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="n">matlen</span><span class="p">)</span> <span class="o">*</span> <span class="n">linepos</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="genomeplot"><a class="viewcode-back" href="../orca_utils.html#orca_utils.genomeplot">[docs]</a><span class="k">def</span> <span class="nf">genomeplot</span><span class="p">(</span>
+    <span class="n">output</span><span class="p">,</span>
+    <span class="n">show_genes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_tracks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">unscaled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">unscaled_cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">maskpred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the multiscale prediction outputs for 32Mb output.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output : dict</span>
+<span class="sd">        The result dictionary to plot as returned by `genomepredict_256Mb`.</span>
+<span class="sd">    show_genes : bool, optional</span>
+<span class="sd">        Default is False. If True, plot the retrieved</span>
+<span class="sd">        gene annotations corresponding to all windows used for the multiscale prediction.</span>
+<span class="sd">    show_tracks : bool, optional</span>
+<span class="sd">        Default is False. If True, plot the retrieved</span>
+<span class="sd">        chromatin tracks for CTCF, chromatin accessibility and histone marks </span>
+<span class="sd">        for all windows used for the multiscale prediction. </span>
+<span class="sd">    show_coordinates : bool, optional</span>
+<span class="sd">        Default is True. If True, annotate the generated plot with the </span>
+<span class="sd">        genome coordinates.</span>
+<span class="sd">    unscaled : bool, optional</span>
+<span class="sd">        Default is False. If True, plot the predictions and observations</span>
+<span class="sd">        without normalizing by distance-based expectation.</span>
+<span class="sd">    file : str or None, optional</span>
+<span class="sd">        Default is None. The output file prefix. No output file is generated</span>
+<span class="sd">        if set to None.</span>
+<span class="sd">    cmap : str or None, optional</span>
+<span class="sd">        Default is None. The colormap for plotting scaled interactions (log</span>
+<span class="sd">        fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</span>
+<span class="sd">    unscaled_cmap : str or None, optional</span>
+<span class="sd">        Default is None. The colormap for plotting unscaled interactions (log</span>
+<span class="sd">        balanced contact score). If None, use colormaps.hnh_cmap_ext5.</span>
+<span class="sd">    colorbar : bool, optional</span>
+<span class="sd">        Default is True. Whether to plot the colorbar.</span>
+<span class="sd">    maskpred : bool, optional</span>
+<span class="sd">        Default is True. If True, the prediction heatmaps are masked at positions</span>
+<span class="sd">        where the observed data have missing values when observed data are provided</span>
+<span class="sd">        in output dict.</span>
+<span class="sd">    vmin : int, optional</span>
+<span class="sd">        Default is -1. The lowerbound value for heatmap colormap.</span>
+<span class="sd">    vmax : int, optional</span>
+<span class="sd">        Default is 2. The upperbound value for heatmap colormap.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">hnh_cmap_ext5</span>
+    <span class="k">if</span> <span class="n">unscaled_cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">unscaled_cmap</span> <span class="o">=</span> <span class="n">hnh_cmap_ext5</span>
+
+    <span class="n">n_axes</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">all_axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">n_axes</span><span class="p">),</span> <span class="n">nrows</span><span class="o">=</span><span class="n">n_axes</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row_axes</span> <span class="ow">in</span> <span class="n">all_axes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">row_axes</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xlabel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;1Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;2Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;4Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;8Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;16Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;32Mb&quot;</span><span class="p">]):</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Obs&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Obs&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">current_row</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">plotmat</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">maskpred</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">bwcmap</span><span class="p">,</span>
+                <span class="p">)</span>
+
+    <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">plotmat</span><span class="p">,</span>
+                    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                    <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+        <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">plotmat</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">maskpred</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">bwcmap</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">plotmat</span><span class="p">,</span>
+                    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                    <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+        <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">all_axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.005</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">show_genes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/hg38.refGeneSelectMANE.bed.gz&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/resources/hg38.refGeneSelectMANE.bed.gz.tbi&quot;</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">show_genes</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;`show_genes` is turned off because resource file &quot;</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="s2">&quot; is not available.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">if</span> <span class="n">show_tracks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_CTCF_ENCFF473IZV.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_RAD21_ENCFF913JGA.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_DNase_ENCFF131HMO.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K4me3_ENCFF623ZAW.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_POLR2A_ENCFF379IRQ.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K27ac_ENCFF423TVA.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K4me1_ENCFF584AVI.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K36me3_ENCFF141YAA.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K27me3_ENCFF912ZUR.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/H1_H3K9me3_ENCFF752UGN.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_CTCF_ENCFF761RHS.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_DNase_ENCFF113YFF.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K4me3_ENCFF442WNT.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K27ac_ENCFF078JZB.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K4me1_ENCFF449DEA.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K36me3_ENCFF954UKB.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K27me3_ENCFF027GWJ.bigWig&quot;</span><span class="p">,</span>
+            <span class="n">ORCA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/extra/foreskin_fibroblast_H3K9me3_ENCFF946TXL.bigWig&quot;</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">show_tracks</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;`show_tracks` is turned off because resource file &quot;</span> <span class="o">+</span> <span class="n">p</span> <span class="o">+</span> <span class="s2">&quot; is not available.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">if</span> <span class="n">show_genes</span> <span class="ow">or</span> <span class="n">show_tracks</span><span class="p">:</span>
+        <span class="n">browser_tracks</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [spacer]</span>
+<span class="sd">        height = 0.5</span>
+<span class="sd">        [x-axis]</span>
+<span class="sd">        where = top</span>
+<span class="sd">        fontsize = 12</span>
+<span class="sd">        [spacer]</span>
+<span class="sd">        height = 0.05</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+            <span class="o">+</span> <span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [test gtf collapsed]</span>
+<span class="sd">        file = {ORCA_PATH}/resources/hg38.refGeneSelectMANE.bed.gz</span>
+<span class="sd">        height = 25</span>
+<span class="sd">        merge_transcripts = true</span>
+<span class="sd">        prefered_name = gene_name</span>
+<span class="sd">        max_labels = 10000</span>
+<span class="sd">        fontsize = 9</span>
+<span class="sd">        file_type = bed</span>
+<span class="sd">        gene_rows = 40</span>
+<span class="sd">        display = stacked</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ORCA_PATH</span><span class="o">=</span><span class="n">ORCA_PATH</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">show_genes</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_CTCF_ENCFF473IZV.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-CTCF</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_RAD21_ENCFF913JGA.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-RAD21</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_DNase_ENCFF131HMO.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-DNase</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #2A6D8F</span>
+
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K4me3_ENCFF623ZAW.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K4me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #E76F51</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_POLR2A_ENCFF379IRQ.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-POL2</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #E76F51</span>
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K27ac_ENCFF423TVA.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K27ac</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #F4A261</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K4me1_ENCFF584AVI.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K4me1</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #F4A261</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K36me3_ENCFF141YAA.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K36me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #E9C46A</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K27me3_ENCFF912ZUR.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K27me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #264653</span>
+
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/H1_H3K9me3_ENCFF752UGN.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = H1-H3K9me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #264653</span>
+<span class="sd">        </span>
+<span class="sd">        [spacer]</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_CTCF_ENCFF761RHS.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-CTCF</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_DNase_ENCFF113YFF.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-DNase</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #2A6D8F</span>
+
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K4me3_ENCFF442WNT.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K4me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #E76F51</span>
+
+
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K27ac_ENCFF078JZB.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K27ac</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #F4A261</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K4me1_ENCFF449DEA.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K4me1</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #F4A261</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K36me3_ENCFF954UKB.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K36me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #E9C46A</span>
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K27me3_ENCFF027GWJ.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K27me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #264653</span>
+
+<span class="sd">        </span>
+<span class="sd">        [bigwig file test]</span>
+<span class="sd">        file = {ORCA_PATH}/extra/foreskin_fibroblast_H3K9me3_ENCFF946TXL.bigWig</span>
+<span class="sd">        # height of the track in cm (optional value)</span>
+<span class="sd">        height = 2</span>
+<span class="sd">        title = HFF-H3K9me3</span>
+<span class="sd">        summary_method = mean</span>
+<span class="sd">        file_type = bigwig</span>
+<span class="sd">        color = #264653</span>
+<span class="sd">    </span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ORCA_PATH</span><span class="o">=</span><span class="n">ORCA_PATH</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">show_tracks</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/dev/shm/temp.ini&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">browser_tracks</span><span class="p">)</span>
+
+        <span class="n">gbfigs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;32Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;16Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;8Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;4Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;2Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;1Mb&quot;</span><span class="p">]):</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]))</span>
+                <span class="o">+</span> <span class="s2">&quot;-&quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]))</span>
+            <span class="p">)</span>
+
+            <span class="kn">import</span> <span class="nn">pygenometracks.plotTracks</span>
+            <span class="kn">import</span> <span class="nn">uuid</span>
+
+            <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;--tracks /dev/shm/temp.ini --region </span><span class="si">{regionstr}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;--trackLabelFraction 0.03 --width 40 --dpi 10 &quot;</span>
+                <span class="n">f</span><span class="s2">&quot;--outFileName /dev/shm/</span><span class="si">{filename}</span><span class="s2">.png --title </span><span class="si">{label}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">pygenometracks</span><span class="o">.</span><span class="n">plotTracks</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">gbfigs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">())</span>
+
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;/dev/shm/</span><span class="si">{filename}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">PdfPages</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+                <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">PdfPages</span><span class="p">((</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;.anno.pdf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">gbfigs</span><span class="p">):</span>
+                    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">PdfPages</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+                <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="genomeplot_256Mb"><a class="viewcode-back" href="../orca_utils.html#orca_utils.genomeplot_256Mb">[docs]</a><span class="k">def</span> <span class="nf">genomeplot_256Mb</span><span class="p">(</span>
+    <span class="n">output</span><span class="p">,</span>
+    <span class="n">show_coordinates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">unscaled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">unscaled_cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">maskpred</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the multiscale prediction outputs for 256Mb output.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output : dict</span>
+<span class="sd">        The result dictionary to plot as returned by `genomepredict_256Mb`.</span>
+<span class="sd">    show_coordinates : bool, optional</span>
+<span class="sd">        Default is True. If True, annotate the generated plot with the </span>
+<span class="sd">        genome coordinates.</span>
+<span class="sd">    unscaled : bool, optional</span>
+<span class="sd">        Default is False. If True, plot the predictions and observations</span>
+<span class="sd">        without normalizing by distance-based expectation.</span>
+<span class="sd">    file : str or None, optional</span>
+<span class="sd">        Default is None. The output file prefix. No output file is generated</span>
+<span class="sd">        if set to None.</span>
+<span class="sd">    cmap : str or None, optional</span>
+<span class="sd">        Default is None. The colormap for plotting scaled interactions (log</span>
+<span class="sd">        fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</span>
+<span class="sd">    unscaled_cmap : str or None, optional</span>
+<span class="sd">        Default is None. The colormap for plotting unscaled interactions (log</span>
+<span class="sd">        balanced contact score). If None, use colormaps.hnh_cmap_ext5.</span>
+<span class="sd">    colorbar : bool, optional</span>
+<span class="sd">        Default is True. Whether to plot the colorbar.</span>
+<span class="sd">    maskpred : bool, optional</span>
+<span class="sd">        Default is True. If True, the prediction heatmaps are masked at positions</span>
+<span class="sd">        where the observed data have missing values when observed data are provided</span>
+<span class="sd">        in output dict.</span>
+<span class="sd">    vmin : int, optional</span>
+<span class="sd">        Default is -1. The lowerbound value for heatmap colormap.</span>
+<span class="sd">    vmax : int, optional</span>
+<span class="sd">        Default is 2. The upperbound value for heatmap colormap.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">hnh_cmap_ext5</span>
+    <span class="k">if</span> <span class="n">unscaled_cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">unscaled_cmap</span> <span class="o">=</span> <span class="n">hnh_cmap_ext5</span>
+
+    <span class="n">n_axes</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">all_axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">n_axes</span><span class="p">),</span> <span class="n">nrows</span><span class="o">=</span><span class="n">n_axes</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row_axes</span> <span class="ow">in</span> <span class="n">all_axes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">row_axes</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xlabel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;32Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;64Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;128Mb&quot;</span><span class="p">,</span> <span class="s2">&quot;256Mb&quot;</span><span class="p">]):</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Obs&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Obs&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;H1-ESC Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">all_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span>
+            <span class="s2">&quot;HFF Pred&quot;</span><span class="p">,</span>
+            <span class="n">labelpad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">current_row</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">padlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="mi">256000000</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">ii</span><span class="p">))</span> <span class="o">-</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="n">padlen</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;padding_chr&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;-&quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;; &quot;</span>
+                <span class="o">+</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;padding_chr&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="s2">&quot;:0-&quot;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">padlen</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">plotmat</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">padlen</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># draw chr boundary</span>
+            <span class="n">chrlen_ratio</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">padlen</span> <span class="o">/</span> <span class="p">(</span><span class="mi">256000000</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">ii</span><span class="p">))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">maskpred</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">bwcmap</span><span class="p">,</span>
+                <span class="p">)</span>
+
+    <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">padlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="mi">256000000</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">ii</span><span class="p">))</span> <span class="o">-</span> <span class="n">e</span>
+            <span class="k">if</span> <span class="n">padlen</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;padding_chr&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">regionstr</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;-&quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;; &quot;</span>
+                    <span class="o">+</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;padding_chr&quot;</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="s2">&quot;:0-&quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">padlen</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">plotmat</span><span class="p">,</span>
+                    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                    <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">padlen</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># draw chr boundary</span>
+                <span class="n">chrlen_ratio</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">padlen</span> <span class="o">/</span> <span class="p">(</span><span class="mi">256000000</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">ii</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="mi">250</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="mi">250</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">250.5</span><span class="p">],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                    <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">250.5</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="mi">250</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">chrlen_ratio</span> <span class="o">*</span> <span class="mi">250</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                    <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+        <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+        <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                <span class="n">plotmat</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">maskpred</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">bwcmap</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">all_axes</span><span class="p">[</span><span class="n">current_row</span><span class="p">])):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;start_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;end_coords&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">regionstr</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show_coordinates</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">regionstr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unscaled</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;normmats&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">])</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+                    <span class="n">plotmat</span><span class="p">,</span>
+                    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">unscaled_cmap</span><span class="p">,</span>
+                    <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plotmat</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
+                <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">plotmat</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;annos&quot;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">_draw_region</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">_draw_site</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">plotmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+        <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">all_axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.005</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">PdfPages</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+            <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span></div>
+
+
+<span class="n">GRange</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;GRange&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;chr&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;strand&quot;</span><span class="p">])</span>
+<span class="n">LGRange</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;LGRange&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="StructuralChange2"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2">[docs]</a><span class="k">class</span> <span class="nc">StructuralChange2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class stores and manupulating structural changes for a single </span>
+<span class="sd">    chromosome and allow querying the mutated chromosome by coordinates by providing </span>
+<span class="sd">    utilities for retrieving the corresponding reference genome segments.</span>
+
+<span class="sd">    The basic operations that StructuralChange2 supports are duplication, deletion, </span>
+<span class="sd">    inversion, insertion, and concatenation. StructuralChange2 objects can be concatenated with &#39;+&#39; </span>
+<span class="sd">    operator, this operation allows concatenating two chromosomes. &#39;+&#39; can be combined with</span>
+<span class="sd">    other basic operations to create fused chromosomes.</span>
+
+<span class="sd">    These operations can be used sequentially to introduce arbitrarily complex </span>
+<span class="sd">    structural changes. However, note that the coordinates are dynamically updated </span>
+<span class="sd">    after each operation reflecting the current state of the chromosome, thus coordinates </span>
+<span class="sd">    specified in later operation must take into account of the effects of all previous</span>
+<span class="sd">    operations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chr_name : str</span>
+<span class="sd">        Name of the reference chromosome.</span>
+<span class="sd">    length : int</span>
+<span class="sd">        The length of the reference chromosome.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    -------</span>
+<span class="sd">    segments : list(LGRange)</span>
+<span class="sd">        List of reference genome segments that constitute the (mutated)</span>
+<span class="sd">        chromosome. Each element is a LGRange namedtuple (length and a </span>
+<span class="sd">        GRange namedtuple (chr: str, start: int, end: int, strand: str)).</span>
+<span class="sd">    chr_name : str</span>
+<span class="sd">        Name of the chromosome</span>
+<span class="sd">    coord_points : list(int)</span>
+<span class="sd">        Stores `N+1` key coordinates where `N` is the number of segments. The</span>
+<span class="sd">        key coordinates are 0, segment junction positions, and chromosome end </span>
+<span class="sd">        coordinate. `coord_points` reflects the current state of the chromosome.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chr_name</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">LGRange</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">GRange</span><span class="p">(</span><span class="n">chr_name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chr_name</span> <span class="o">=</span> <span class="n">chr_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">]</span>
+
+<div class="viewcode-block" id="StructuralChange2.coord_sync"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.coord_sync">[docs]</a>    <span class="k">def</span> <span class="nf">coord_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">len</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="n">segind</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">segstart</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">segind</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">!=</span> <span class="n">segstart</span><span class="p">:</span>
+            <span class="c1"># split segment</span>
+            <span class="n">ref_chr</span><span class="p">,</span> <span class="n">ref_s</span><span class="p">,</span> <span class="n">ref_e</span><span class="p">,</span> <span class="n">ref_strand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">segind</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span>
+            <span class="k">if</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+                <span class="n">ref_1</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span><span class="n">ref_chr</span><span class="p">,</span> <span class="n">ref_s</span><span class="p">,</span> <span class="n">ref_s</span> <span class="o">+</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">segstart</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">)</span>
+                <span class="n">ref_2</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span><span class="n">ref_chr</span><span class="p">,</span> <span class="n">ref_s</span> <span class="o">+</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">segstart</span><span class="p">,</span> <span class="n">ref_e</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ref_1</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span><span class="n">ref_chr</span><span class="p">,</span> <span class="n">ref_e</span> <span class="o">-</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="n">segstart</span><span class="p">),</span> <span class="n">ref_e</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="n">ref_2</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span><span class="n">ref_chr</span><span class="p">,</span> <span class="n">ref_s</span><span class="p">,</span> <span class="n">ref_e</span> <span class="o">-</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="n">segstart</span><span class="p">),</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">segind</span><span class="p">]</span> <span class="o">=</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">ref_1</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">ref_1</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ref_1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">segind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">ref_2</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">ref_2</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ref_2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">segments</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">segments</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">segments</span>
+        <span class="n">alen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coord_points</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">coord_points</span><span class="p">)):</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">a</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">alen</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">a</span>
+
+<div class="viewcode-block" id="StructuralChange2.duplicate"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="c1"># start and end in cgenome coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+
+        <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind_e</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">seg</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StructuralChange2.insert"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ins&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind_s</span><span class="p">,</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">GRange</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">strand</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StructuralChange2.delete"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="c1"># start and end in cgenome coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+
+        <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StructuralChange2.invert"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="c1"># start and end in cgenome coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+
+        <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ind_s</span><span class="p">,</span> <span class="n">ind_e</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">LGRange</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">len</span><span class="p">,</span>
+                <span class="n">GRange</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">chr</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+                    <span class="s2">&quot;-&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StructuralChange2.query"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+
+        <span class="n">ref_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+                <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chr</span><span class="p">,</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">ind_s</span><span class="p">],</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chr</span><span class="p">,</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="p">(</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">ind_s</span><span class="p">]),</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># when end exceeds length</span>
+        <span class="k">if</span> <span class="n">ind_e</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Warning: query end </span><span class="si">{end}</span><span class="s2"> exceed limit </span><span class="si">{self.coord_points[-1]}</span><span class="s2">!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">chr</span><span class="p">,</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">ind_e</span><span class="p">]</span> <span class="o">-</span> <span class="n">end</span><span class="p">),</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">GRange</span><span class="p">(</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">chr</span><span class="p">,</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">ind_e</span><span class="p">]</span> <span class="o">-</span> <span class="n">end</span><span class="p">),</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+                        <span class="n">ref_coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strand</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ref_coords</span></div>
+
+<div class="viewcode-block" id="StructuralChange2.query_ref"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.query_ref">[docs]</a>    <span class="k">def</span> <span class="nf">query_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chr_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="n">current_coords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ref_coords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">seglen</span><span class="p">,</span> <span class="n">refseg</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">refseg</span><span class="o">.</span><span class="n">chr</span> <span class="o">==</span> <span class="n">chr_name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">refseg</span><span class="o">.</span><span class="n">end</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;=</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                    <span class="n">ref_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">refseg</span><span class="o">.</span><span class="n">end</span><span class="p">),</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">refseg</span><span class="o">.</span><span class="n">end</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">refseg</span><span class="o">.</span><span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+                        <span class="n">current_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">start</span> <span class="o">-</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seglen</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seglen</span><span class="p">),</span>
+                                <span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">current_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">start</span> <span class="o">-</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seglen</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">refseg</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seglen</span><span class="p">),</span>
+                                <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ref_coords</span><span class="p">,</span> <span class="n">current_coords</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="process_anno"><a class="viewcode-back" href="../orca_utils.html#orca_utils.process_anno">[docs]</a><span class="k">def</span> <span class="nf">process_anno</span><span class="p">(</span><span class="n">anno_scaled</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">window_radius</span><span class="o">=</span><span class="mi">16000000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process annotations to the format used by Orca plotting</span>
+<span class="sd">    functions such as `genomeplot` and `genomeplot_256Mb`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    anno_scaled : list(list(...))</span>
+<span class="sd">        List of annotations. Each annotation can be a region specified by</span>
+<span class="sd">        `[start: int, end: int, info:str]` or a position specified by </span>
+<span class="sd">        `[pos: int, info:str]`. </span>
+<span class="sd">        Acceptable info strings for region currently include color names for </span>
+<span class="sd">        matplotlib. Acceptable info strings for position are currently </span>
+<span class="sd">        &#39;single&#39; or &#39;double&#39;, which direct whether the annotation is drawn </span>
+<span class="sd">        by single or double lines.</span>
+<span class="sd">    base : int</span>
+<span class="sd">        The starting position of the 32Mb (if window_radius is 16000000) </span>
+<span class="sd">        or 256Mb (if window_radius is 128000000) region analyzed.</span>
+<span class="sd">    window_radius : int</span>
+<span class="sd">        The size of the region analyzed. It must be either 16000000 (32Mb region)</span>
+<span class="sd">        or 128000000 (256Mb region).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    annotation : list</span>
+<span class="sd">        Processed annotations with coordinates transformed to relative coordinate</span>
+<span class="sd">        in the range of 0-1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">annotation</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">anno_scaled</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">annotation</span><span class="o">.</span><span class="n">append</span><span class="p">([(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="k">return</span> <span class="n">annotation</span></div>
+
+
+<div class="viewcode-block" id="coord_clip"><a class="viewcode-back" href="../orca_utils.html#orca_utils.coord_clip">[docs]</a><span class="k">def</span> <span class="nf">coord_clip</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">chrlen</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">128000</span><span class="p">,</span> <span class="n">window_radius</span><span class="o">=</span><span class="mi">16000000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clip the coordinate to make sure that full window</span>
+<span class="sd">    centered at the coordinate to stay within chromosome boundaries.</span>
+<span class="sd">    coord_clip also try to preserve the relative position of the coordinate</span>
+<span class="sd">    to the grid as specified by binsize whenever possible.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : int or numpy.ndarray</span>
+<span class="sd">        Coordinates to round.</span>
+<span class="sd">    gridsize : int</span>
+<span class="sd">        The gridsize to round by</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The clipped coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="n">binsize</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">chrlen</span> <span class="o">-</span> <span class="n">binsize</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">window_radius</span><span class="p">,</span> <span class="n">chrlen</span> <span class="o">-</span> <span class="n">window_radius</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">chrlen</span> <span class="o">-</span> <span class="n">window_radius</span><span class="p">)</span> <span class="o">%</span> <span class="n">binsize</span> <span class="o">&gt;</span> <span class="n">pos</span> <span class="o">%</span> <span class="n">binsize</span><span class="p">:</span>
+            <span class="n">endclip</span> <span class="o">=</span> <span class="n">chrlen</span> <span class="o">-</span> <span class="n">window_radius</span> <span class="o">-</span> <span class="p">((</span><span class="n">chrlen</span> <span class="o">-</span> <span class="n">window_radius</span><span class="p">)</span> <span class="o">%</span> <span class="n">binsize</span> <span class="o">-</span> <span class="n">pos</span> <span class="o">%</span> <span class="n">binsize</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">endclip</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">chrlen</span>
+                <span class="o">-</span> <span class="n">window_radius</span>
+                <span class="o">-</span> <span class="n">binsize</span>
+                <span class="o">-</span> <span class="p">((</span><span class="n">chrlen</span> <span class="o">-</span> <span class="n">window_radius</span><span class="p">)</span> <span class="o">%</span> <span class="n">binsize</span> <span class="o">-</span> <span class="n">pos</span> <span class="o">%</span> <span class="n">binsize</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">window_radius</span> <span class="o">+</span> <span class="n">pos</span> <span class="o">%</span> <span class="n">binsize</span><span class="p">,</span> <span class="n">endclip</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="coord_round"><a class="viewcode-back" href="../orca_utils.html#orca_utils.coord_round">[docs]</a><span class="k">def</span> <span class="nf">coord_round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gridsize</span><span class="o">=</span><span class="mi">4000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Round coordinate to multiples of gridsize.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : int or numpy.ndarray</span>
+<span class="sd">        Coordinates to round.</span>
+<span class="sd">    gridsize : int</span>
+<span class="sd">        The gridsize to round by</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The rounded coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="n">x</span> <span class="o">%</span> <span class="n">gridsize</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

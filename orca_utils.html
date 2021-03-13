@@ -1,0 +1,510 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>orca_utils module &mdash; Orca 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="orca_models module" href="orca_models.html" />
+    <link rel="prev" title="orca_predict module" href="orca_predict.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Orca
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="orca_predict.html">orca_predict module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">orca_utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_models.html">orca_models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orca_modules.html">orca_modules module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selene_utils2.html">selene_utils2 module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Orca</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>orca_utils module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/orca_utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-orca_utils">
+<span id="orca-utils-module"></span><h1>orca_utils module<a class="headerlink" href="#module-orca_utils" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the utilities for Orca-based applications,
+including a class for structural variants and plotting utilities.</p>
+<dl class="class">
+<dt id="orca_utils.GRange">
+<em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">GRange</code><span class="sig-paren">(</span><em class="sig-param">chr</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em>, <em class="sig-param">strand</em><span class="sig-paren">)</span><a class="headerlink" href="#orca_utils.GRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="orca_utils.GRange.chr">
+<em class="property">property </em><code class="sig-name descname">chr</code><a class="headerlink" href="#orca_utils.GRange.chr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.GRange.end">
+<em class="property">property </em><code class="sig-name descname">end</code><a class="headerlink" href="#orca_utils.GRange.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.GRange.start">
+<em class="property">property </em><code class="sig-name descname">start</code><a class="headerlink" href="#orca_utils.GRange.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.GRange.strand">
+<em class="property">property </em><code class="sig-name descname">strand</code><a class="headerlink" href="#orca_utils.GRange.strand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_utils.LGRange">
+<em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">LGRange</code><span class="sig-paren">(</span><em class="sig-param">len</em>, <em class="sig-param">ref</em><span class="sig-paren">)</span><a class="headerlink" href="#orca_utils.LGRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="orca_utils.LGRange.len">
+<em class="property">property </em><code class="sig-name descname">len</code><a class="headerlink" href="#orca_utils.LGRange.len" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.LGRange.ref">
+<em class="property">property </em><code class="sig-name descname">ref</code><a class="headerlink" href="#orca_utils.LGRange.ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="orca_utils.StructuralChange2">
+<em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">StructuralChange2</code><span class="sig-paren">(</span><em class="sig-param">chr_name</em>, <em class="sig-param">length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class stores and manupulating structural changes for a single
+chromosome and allow querying the mutated chromosome by coordinates by providing
+utilities for retrieving the corresponding reference genome segments.</p>
+<p>The basic operations that StructuralChange2 supports are duplication, deletion,
+inversion, insertion, and concatenation. StructuralChange2 objects can be concatenated with ‘+’
+operator, this operation allows concatenating two chromosomes. ‘+’ can be combined with
+other basic operations to create fused chromosomes.</p>
+<p>These operations can be used sequentially to introduce arbitrarily complex
+structural changes. However, note that the coordinates are dynamically updated
+after each operation reflecting the current state of the chromosome, thus coordinates
+specified in later operation must take into account of the effects of all previous
+operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chr_name</strong> (<em>str</em>) – Name of the reference chromosome.</p></li>
+<li><p><strong>length</strong> (<em>int</em>) – The length of the reference chromosome.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="orca_utils.StructuralChange2.segments">
+<code class="sig-name descname">segments</code><a class="headerlink" href="#orca_utils.StructuralChange2.segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of reference genome segments that constitute the (mutated)
+chromosome. Each element is a LGRange namedtuple (length and a
+GRange namedtuple (chr: str, start: int, end: int, strand: str)).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list(<a class="reference internal" href="#orca_utils.LGRange" title="orca_utils.LGRange">LGRange</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="orca_utils.StructuralChange2.chr_name">
+<code class="sig-name descname">chr_name</code><a class="headerlink" href="#orca_utils.StructuralChange2.chr_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the chromosome</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="orca_utils.StructuralChange2.coord_points">
+<code class="sig-name descname">coord_points</code><a class="headerlink" href="#orca_utils.StructuralChange2.coord_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores <cite>N+1</cite> key coordinates where <cite>N</cite> is the number of segments. The
+key coordinates are 0, segment junction positions, and chromosome end
+coordinate. <cite>coord_points</cite> reflects the current state of the chromosome.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list(int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.coord_sync">
+<code class="sig-name descname">coord_sync</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.coord_sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.coord_sync" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.duplicate">
+<code class="sig-name descname">duplicate</code><span class="sig-paren">(</span><em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.duplicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">start</em>, <em class="sig-param">length</em>, <em class="sig-param">strand='+'</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.invert">
+<code class="sig-name descname">invert</code><span class="sig-paren">(</span><em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.invert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.invert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.query">
+<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="orca_utils.StructuralChange2.query_ref">
+<code class="sig-name descname">query_ref</code><span class="sig-paren">(</span><em class="sig-param">chr_name</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2.query_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2.query_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_utils.coord_clip">
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">coord_clip</code><span class="sig-paren">(</span><em class="sig-param">pos</em>, <em class="sig-param">chrlen</em>, <em class="sig-param">binsize=128000</em>, <em class="sig-param">window_radius=16000000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#coord_clip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.coord_clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clip the coordinate to make sure that full window
+centered at the coordinate to stay within chromosome boundaries.
+coord_clip also try to preserve the relative position of the coordinate
+to the grid as specified by binsize whenever possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em><em> or </em><em>numpy.ndarray</em>) – Coordinates to round.</p></li>
+<li><p><strong>gridsize</strong> (<em>int</em>) – The gridsize to round by</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The clipped coordinate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_utils.coord_round">
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">coord_round</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">gridsize=4000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#coord_round"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.coord_round" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round coordinate to multiples of gridsize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em><em> or </em><em>numpy.ndarray</em>) – Coordinates to round.</p></li>
+<li><p><strong>gridsize</strong> (<em>int</em>) – The gridsize to round by</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The rounded coordinate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_utils.genomeplot">
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot</code><span class="sig-paren">(</span><em class="sig-param">output</em>, <em class="sig-param">show_genes=False</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">show_coordinates=True</em>, <em class="sig-param">unscaled=False</em>, <em class="sig-param">file=None</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">unscaled_cmap=None</em>, <em class="sig-param">colorbar=True</em>, <em class="sig-param">maskpred=False</em>, <em class="sig-param">vmin=-1</em>, <em class="sig-param">vmax=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the multiscale prediction outputs for 32Mb output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>dict</em>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
+<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
+gene annotations corresponding to all windows used for the multiscale prediction.</p></li>
+<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
+chromatin tracks for CTCF, chromatin accessibility and histone marks
+for all windows used for the multiscale prediction.</p></li>
+<li><p><strong>show_coordinates</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
+genome coordinates.</p></li>
+<li><p><strong>unscaled</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
+without normalizing by distance-based expectation.</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
+if set to None.</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
+fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</p></li>
+<li><p><strong>unscaled_cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
+balanced contact score). If None, use colormaps.hnh_cmap_ext5.</p></li>
+<li><p><strong>colorbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
+<li><p><strong>maskpred</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
+where the observed data have missing values when observed data are provided
+in output dict.</p></li>
+<li><p><strong>vmin</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
+<li><p><strong>vmax</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_utils.genomeplot_256Mb">
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot_256Mb</code><span class="sig-paren">(</span><em class="sig-param">output</em>, <em class="sig-param">show_coordinates=True</em>, <em class="sig-param">unscaled=False</em>, <em class="sig-param">file=None</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">unscaled_cmap=None</em>, <em class="sig-param">colorbar=True</em>, <em class="sig-param">maskpred=True</em>, <em class="sig-param">vmin=-1</em>, <em class="sig-param">vmax=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot_256Mb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot_256Mb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the multiscale prediction outputs for 256Mb output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>dict</em>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
+<li><p><strong>show_coordinates</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
+genome coordinates.</p></li>
+<li><p><strong>unscaled</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
+without normalizing by distance-based expectation.</p></li>
+<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
+if set to None.</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
+fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</p></li>
+<li><p><strong>unscaled_cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
+balanced contact score). If None, use colormaps.hnh_cmap_ext5.</p></li>
+<li><p><strong>colorbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
+<li><p><strong>maskpred</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
+where the observed data have missing values when observed data are provided
+in output dict.</p></li>
+<li><p><strong>vmin</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
+<li><p><strong>vmax</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="orca_utils.process_anno">
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">process_anno</code><span class="sig-paren">(</span><em class="sig-param">anno_scaled</em>, <em class="sig-param">base=0</em>, <em class="sig-param">window_radius=16000000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#process_anno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.process_anno" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process annotations to the format used by Orca plotting
+functions such as <cite>genomeplot</cite> and <cite>genomeplot_256Mb</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anno_scaled</strong> (<em>list</em><em>(</em><em>list</em><em>(</em><em>..</em><em>)</em><em>)</em>) – List of annotations. Each annotation can be a region specified by
+<cite>[start: int, end: int, info:str]</cite> or a position specified by
+<cite>[pos: int, info:str]</cite>.
+Acceptable info strings for region currently include color names for
+matplotlib. Acceptable info strings for position are currently
+‘single’ or ‘double’, which direct whether the annotation is drawn
+by single or double lines.</p></li>
+<li><p><strong>base</strong> (<em>int</em>) – The starting position of the 32Mb (if window_radius is 16000000)
+or 256Mb (if window_radius is 128000000) region analyzed.</p></li>
+<li><p><strong>window_radius</strong> (<em>int</em>) – The size of the region analyzed. It must be either 16000000 (32Mb region)
+or 128000000 (256Mb region).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>annotation</strong> – Processed annotations with coordinates transformed to relative coordinate
+in the range of 0-1.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="orca_models.html" class="btn btn-neutral float-right" title="orca_models module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="orca_predict.html" class="btn btn-neutral float-left" title="orca_predict module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Zhou Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
