@@ -33,6 +33,7 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -157,13 +158,15 @@
   <h1>Source code for selene_utils2</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module provides the selene-based utilities for training and using </span>
-<span class="sd">Orca sequence models for multiscale genome interaction prediction. </span>
+<span class="sd">Orca sequence models for multiscale genome interaction prediction. This</span>
+<span class="sd">module contains code from selene.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -304,6 +307,7 @@
 
 <div class="viewcode-block" id="MemmapGenome.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="c1"># delay initlization to allow  multiprocessing</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_unpicklable_init</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -312,7 +316,8 @@
 
 <div class="viewcode-block" id="MemmapGenome.get_encoding_from_coords"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MemmapGenome.get_encoding_from_coords">[docs]</a>    <span class="nd">@init</span>
     <span class="k">def</span> <span class="nf">get_encoding_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the one-hot encoding of the genomic sequence at the</span>
 <span class="sd">        queried coordinates.</span>
 
 <span class="sd">        Parameters</span>
@@ -604,6 +609,7 @@
 <div class="viewcode-block" id="MultibinGenomicFeatures.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.MultibinGenomicFeatures.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="c1"># delay initlization to allow multiprocessing (not necessary here</span>
         <span class="c1"># but kept for consistency)</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pyranges</span><span class="o">.</span><span class="n">read_bed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
@@ -640,6 +646,7 @@
 <span class="sd">        numpy.ndarray</span>
 <span class="sd">            :math:`L \\times N` array, where :math:`L = ``number of bins`</span>
 <span class="sd">            and :math:`N =` `self.n_features`.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">n_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_size</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -901,6 +908,7 @@
 
 <div class="viewcode-block" id="RandomPositionsSamplerHiC.init"><a class="viewcode-back" href="../selene_utils2.html#selene_utils2.RandomPositionsSamplerHiC.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="c1"># delay initlization to allow  multiprocessing</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_chromosome</span><span class="p">()</span>

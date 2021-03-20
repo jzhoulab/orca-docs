@@ -33,6 +33,7 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -1031,10 +1032,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">chr_name</span> <span class="o">=</span> <span class="n">chr_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">]</span>
 
-<div class="viewcode-block" id="StructuralChange2.coord_sync"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.coord_sync">[docs]</a>    <span class="k">def</span> <span class="nf">coord_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_coord_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">len</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">len</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
         <span class="n">segind</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1051,7 +1052,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">segind</span><span class="p">]</span> <span class="o">=</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">ref_1</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">ref_1</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ref_1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">segind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">ref_2</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">ref_2</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ref_2</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_sync</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1063,6 +1064,9 @@
         <span class="k">return</span> <span class="n">a</span>
 
 <div class="viewcode-block" id="StructuralChange2.duplicate"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Duplicate a genomic region.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># start and end in cgenome coordinates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
@@ -1072,17 +1076,23 @@
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind_e</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">seg</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_sync</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StructuralChange2.insert"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a genomic sequence with given length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ins&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind_s</span><span class="p">,</span> <span class="n">LGRange</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">GRange</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">strand</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_sync</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StructuralChange2.delete"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete a genomic region.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># start and end in cgenome coordinates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
@@ -1090,9 +1100,12 @@
         <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">ind_s</span><span class="p">:</span><span class="n">ind_e</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_sync</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StructuralChange2.invert"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invert a genomic region.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># start and end in cgenome coordinates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
@@ -1111,9 +1124,13 @@
                     <span class="s2">&quot;-&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coord_sync</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_sync</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StructuralChange2.query"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the segments in the reference genome that constitute</span>
+<span class="sd">        the specified interval in the mutated genome.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ind_s</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">ind_e</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord_points</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
@@ -1159,6 +1176,10 @@
         <span class="k">return</span> <span class="n">ref_coords</span></div>
 
 <div class="viewcode-block" id="StructuralChange2.query_ref"><a class="viewcode-back" href="../orca_utils.html#orca_utils.StructuralChange2.query_ref">[docs]</a>    <span class="k">def</span> <span class="nf">query_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chr_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve regions that correspond to the specified reference genome interval</span>
+<span class="sd">        in the mutated genome.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_coords</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">ref_coords</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">seglen</span><span class="p">,</span> <span class="n">refseg</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>

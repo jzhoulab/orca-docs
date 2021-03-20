@@ -33,6 +33,7 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -160,7 +161,8 @@
   <div class="section" id="module-selene_utils2">
 <span id="selene-utils2-module"></span><h1>selene_utils2 module<a class="headerlink" href="#module-selene_utils2" title="Permalink to this headline">¶</a></h1>
 <p>This module provides the selene-based utilities for training and using
-Orca sequence models for multiscale genome interaction prediction.</p>
+Orca sequence models for multiscale genome interaction prediction. This
+module contains code from selene.</p>
 <dl class="class">
 <dt id="selene_utils2.Genomic2DFeatures">
 <em class="property">class </em><code class="sig-prename descclassname">selene_utils2.</code><code class="sig-name descname">Genomic2DFeatures</code><span class="sig-paren">(</span><em class="sig-param">input_paths</em>, <em class="sig-param">features</em>, <em class="sig-param">shape</em>, <em class="sig-param">cg=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#Genomic2DFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.Genomic2DFeatures" title="Permalink to this definition">¶</a></dt>
@@ -310,13 +312,76 @@ the length of said chromosome.</p>
 
 <dl class="method">
 <dt id="selene_utils2.MemmapGenome.get_encoding_from_coords">
-<code class="sig-name descname">get_encoding_from_coords</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome.get_encoding_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">get_encoding_from_coords</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em>, <em class="sig-param">strand='+'</em>, <em class="sig-param">pad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome.get_encoding_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the one-hot encoding of the genomic sequence at the
+queried coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the chromosome or region, e.g. “chr1”.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The 0-based start coordinate of the first position in the
+sequence.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – One past the 0-based last position in the sequence.</p></li>
+<li><p><strong>strand</strong> (<em>{'+'</em><em>, </em><em>'-'</em><em>, </em><em>'.'}</em><em>, </em><em>optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+treated as ‘+’.</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
+and/or <cite>end</cite> are out of bounds to return a sequence of length
+<cite>end - start</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The <span class="math notranslate nohighlight">\(L \times 4\)</span> encoding of the sequence, where
+<span class="math notranslate nohighlight">\(L = end - start\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, dtype=numpy.float32</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If it cannot retrieve encoding that matches the length <cite>L = end - start</cite>
+    such as when end &gt; chromosome length and pad=False</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="selene_utils2.MemmapGenome.get_encoding_from_coords_check_unk">
-<code class="sig-name descname">get_encoding_from_coords_check_unk</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome.get_encoding_from_coords_check_unk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome.get_encoding_from_coords_check_unk" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">get_encoding_from_coords_check_unk</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em>, <em class="sig-param">strand='+'</em>, <em class="sig-param">pad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome.get_encoding_from_coords_check_unk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome.get_encoding_from_coords_check_unk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the one-hot encoding of the genomic sequence at the
+queried coordinates and check whether the sequence contains
+unknown base(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the chromosome or region, e.g. “chr1”.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The 0-based start coordinate of the first position in the
+sequence.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – One past the 0-based last position in the sequence.</p></li>
+<li><p><strong>strand</strong> (<em>{'+'</em><em>, </em><em>'-'</em><em>, </em><em>'.'}</em><em>, </em><em>optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+treated as ‘+’.</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
+and/or <cite>end</cite> are out of bounds to return a sequence of length
+<cite>end - start</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>tuple[0]</cite> is the <span class="math notranslate nohighlight">\(L \times 4\)</span> encoding of the sequence, where</p></li>
+</ul>
+<p><span class="math notranslate nohighlight">\(L = end - start\)</span>.
+<cite>L</cite> = 0 for the NumPy array returned.
+* <cite>tuple[1]</cite> is the boolean value that indicates whether the
+sequence contains any unknown base(s) specified in self.UNK_BASE</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a>)</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If it cannot retrieve encoding that matches the length <cite>L = end - start</cite>
+    such as when end &gt; chromosome length and pad=False</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="selene_utils2.MemmapGenome.init">
@@ -456,8 +521,33 @@ will get assigned 1, otherwise assigned 0.
 
 <dl class="method">
 <dt id="selene_utils2.MultibinGenomicFeatures.get_feature_data">
-<code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MultibinGenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MultibinGenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MultibinGenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MultibinGenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a genomic region specified, return a <cite>number of features</cite>
+by <cite>number of bins</cite> array for overlap of each genomic bin and
+each feature. How the overlap is quantified depends on the
+<cite>mode</cite> attribute specified during initialization.</p>
+<p>For <cite>mode==’any’</cite>, any overlap will get assigned 1, and no overlap will
+get assigned 0.
+For <cite>mode==’center’, only overlap with the center basepair of each bin
+will get assigned 1, otherwise assigned 0.
+For `mode==’proportion’</cite>, the proportion of overlap will be assigned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the region (e.g. ‘1’, ‘2’, …, ‘X’, ‘Y’).</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The 0-based first position in the region.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – One past the 0-based last position in the region.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(L \times N\)</span> array, where <span class="math notranslate nohighlight">\(L = \)</span>
+and <span class="math notranslate nohighlight">\(N =\)</span> <cite>self.n_features</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="selene_utils2.MultibinGenomicFeatures.init">
@@ -761,8 +851,39 @@ the modes listed in <cite>modes</cite>.</p>
 
 <dl class="method">
 <dt id="selene_utils2.RandomPositionsSamplerHiC.sample">
-<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#RandomPositionsSamplerHiC.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.RandomPositionsSamplerHiC.sample" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">batch_size=1</em>, <em class="sig-param">mode=None</em>, <em class="sig-param">coordinate_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#RandomPositionsSamplerHiC.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.RandomPositionsSamplerHiC.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly draws a mini-batch of examples and their corresponding
+labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Default is None. The operating mode that the object should run in.
+If None, will use the current mode <cite>self.mode</cite>.</p></li>
+<li><p><strong>coordinate_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, only return the coordinates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences, targets, …</strong> – A tuple containing the numeric representation of the
+sequence examples, their corresponding 2D targets, and optionally 1D targets
+(if target_1d were specified) and background
+matrices (if background_cis_file and background_trans_file were
+specified). The shape of <cite>sequences</cite> will be
+<span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
+<cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
+The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times M \times M\)</span>,
+where <span class="math notranslate nohighlight">\(M \times M\)</span> is target.shape. The shape of 1D targets
+is <span class="math notranslate nohighlight">\(B \times K \times F\)</span>, where <span class="math notranslate nohighlight">\(K = \)</span>
+and <span class="math notranslate nohighlight">\(F =\)</span> <cite>self.n_features</cite>. The shape of background matrices
+are the same as <cite>targets</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, ..)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
