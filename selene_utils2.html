@@ -169,12 +169,12 @@ Orca sequence models for multiscale genome interaction prediction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_paths</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – List of paths to the Cooler datasets. For mcool files,
+<li><p><strong>input_paths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of paths to the Cooler datasets. For mcool files,
 the path should include the resolution. Please refer to
 cooler.Cooler documentation for support of mcool files.</p></li>
-<li><p><strong>features</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – The list of dataset names that should match the <cite>input_path</cite>.</p></li>
-<li><p><strong>shape</strong> (<em>tuple</em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em>) – The shape of the output array (# of bins by # of bins).</p></li>
-<li><p><strong>cg</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>yes</cite>, adpative coarse-graining is applied to the output.</p></li>
+<li><p><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of dataset names that should match the <cite>input_path</cite>.</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>)</em>) – The shape of the output array (# of bins by # of bins).</p></li>
+<li><p><strong>cg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <cite>yes</cite>, adpative coarse-graining is applied to the output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -184,7 +184,7 @@ cooler.Cooler documentation for support of mcool files.</p></li>
 <dd><p>The list of Cooler objects for the cooler files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(cooler.Cooler)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(cooler.Cooler)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -195,7 +195,7 @@ cooler.Cooler documentation for support of mcool files.</p></li>
 <dd><p>The number of cooler files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -207,7 +207,7 @@ cooler.Cooler documentation for support of mcool files.</p></li>
 where the index is the position of the feature in <cite>features</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -218,7 +218,7 @@ where the index is the position of the feature in <cite>features</cite>.</p>
 <dd><p>The shape of the output array (# of bins by # of bins).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>tuple(int, int)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -229,7 +229,7 @@ where the index is the position of the feature in <cite>features</cite>.</p>
 <dd><p>Whether adpative coarse-graining is applied to the output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -261,14 +261,14 @@ because as each process will try to create the file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_path</strong> (<em>str</em>) – Path to an indexed FASTA file, that is, a <cite>*.fasta</cite> file with
+<li><p><strong>input_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to an indexed FASTA file, that is, a <cite>*.fasta</cite> file with
 a corresponding <cite>*.fai</cite> file in the same directory. This file
 should contain the target organism’s genome sequence.</p></li>
-<li><p><strong>init_unpickleable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If False, delay part of initialization code
+<li><p><strong>init_unpickleable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If False, delay part of initialization code
 to executed only when a relevant method is called. This enables
 the object to be pickled after instantiation. <cite>init_unpickleable</cite> should
 be <cite>False</cite> when used when multi-processing is needed e.g. DataLoader.</p></li>
-<li><p><strong>memmapfile</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Specify the numpy.memmap file for storing the encoding
+<li><p><strong>memmapfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Specify the numpy.memmap file for storing the encoding
 of the genome. If memmapfile does not exist, it will be
 created when the encoding is requested for the first time.</p></li>
 </ul>
@@ -291,7 +291,7 @@ created when the encoding is requested for the first time.</p></li>
 <dd><p>The list of chromosome names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(str)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -303,7 +303,7 @@ created when the encoding is requested for the first time.</p></li>
 the length of said chromosome.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,13 +344,13 @@ table for higher query speed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_path</strong> (<em>str</em>) – Path to the bed file.</p></li>
-<li><p><strong>features</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – The non-redundant list of genomic features names. The output array
+<li><p><strong>input_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the bed file.</p></li>
+<li><p><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The non-redundant list of genomic features names. The output array
 will have the same feature order as specified in this list.</p></li>
-<li><p><strong>bin_size</strong> (<em>int</em>) – The length of the bin(s) in which we check for features</p></li>
-<li><p><strong>step_size</strong> (<em>int</em>) – The interval between two adjacent bins.</p></li>
-<li><p><strong>shape</strong> (<em>tuple</em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em>) – The shape of the output array (n_features by n_bins).</p></li>
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – For <cite>mode==’any’</cite>, any overlap will get 1, and no overlap will get 0.
+<li><p><strong>bin_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of the bin(s) in which we check for features</p></li>
+<li><p><strong>step_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The interval between two adjacent bins.</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>)</em>) – The shape of the output array (n_features by n_bins).</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – For <cite>mode==’any’</cite>, any overlap will get 1, and no overlap will get 0.
 For <cite>mode==’center’, only overlap with the center basepair of each bin
 will get 1, otherwise 0.
 For `mode==’proportion’</cite>, the proportion of overlap will be returned.</p></li>
@@ -374,7 +374,7 @@ For `mode==’proportion’</cite>, the proportion of overlap will be returned.<
 <dd><p>The number of distinct features.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -386,7 +386,7 @@ For `mode==’proportion’</cite>, the proportion of overlap will be returned.<
 where the index is the position of the feature in <cite>features</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,7 +399,7 @@ where the index is the position of the feature in the input
 features.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -410,7 +410,7 @@ features.</p>
 <dd><p>The length of the bin(s) in which we check for features</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -421,7 +421,7 @@ features.</p>
 <dd><p>The interval between two adjacent bins.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -432,7 +432,7 @@ features.</p>
 <dd><p>The shape of the output array (n_features by n_bins).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>tuple(int, int)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -449,7 +449,7 @@ will get assigned 1, otherwise assigned 0.
 - For `mode==’proportion’</cite>, the proportion of overlap will be assigned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -471,60 +471,58 @@ will get assigned 1, otherwise assigned 0.
 <em class="property">class </em><code class="sig-prename descclassname">selene_utils2.</code><code class="sig-name descname">RandomPositionsSamplerHiC</code><span class="sig-paren">(</span><em class="sig-param">reference_sequence, target, features, target_1d=None, background_cis_file=None, background_trans_file=None, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1000000, max_seg_length=None, length_schedule=None, position_resolution=1, random_shift=0, random_strand=True, cross_chromosome=True, permute_segments=False, mode='train'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#RandomPositionsSamplerHiC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.RandomPositionsSamplerHiC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.online_sampler.OnlineSampler</span></code></p>
 <p>This sampler randomly selects a region in the genome and retrieves
-sequence and relevant Hi-C and optionally multibin genomic</p>
-<blockquote>
-<div><p>data from that region. This implementation
-is modified based on selene_sdk.samplers.RandomPositionSampler.</p>
-</div></blockquote>
+sequence and relevant Hi-C and optionally multibin genomic
+data from that region. This implementation is modified based on
+selene_sdk.samplers.RandomPositionSampler.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Genome</em>) – A genome to retrieve sequence from.</p></li>
+<li><p><strong>reference_sequence</strong> (<a class="reference external" href="https://selene.flatironinstitute.org/sequences.html#selene_sdk.sequences.Genome" title="(in Selene vmaster (0.4.8))"><em>selene_sdk.sequences.Genome</em></a>) – A genome to retrieve sequence from.</p></li>
 <li><p><strong>target</strong> (<a class="reference internal" href="#selene_utils2.Genomic2DFeatures" title="selene_utils2.Genomic2DFeatures"><em>Genomic2DFeatures</em></a>) – Genomic2DFeatures object that loads the cooler files.</p></li>
-<li><p><strong>features</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – List of names that correspond to the cooler files.</p></li>
-<li><p><strong>target_1d</strong> (<a class="reference internal" href="#selene_utils2.MultibinGenomicFeatures" title="selene_utils2.MultibinGenomicFeatures"><em>MultibinGenomicFeatures</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – MultibinGenomicFeatures object that loads 1D genomic feature data.</p></li>
-<li><p><strong>background_cis_file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Path to the numpy file that stores the distance-based
+<li><p><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of names that correspond to the cooler files.</p></li>
+<li><p><strong>target_1d</strong> (<a class="reference internal" href="#selene_utils2.MultibinGenomicFeatures" title="selene_utils2.MultibinGenomicFeatures"><em>MultibinGenomicFeatures</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – MultibinGenomicFeatures object that loads 1D genomic feature data.</p></li>
+<li><p><strong>background_cis_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Path to the numpy file that stores the distance-based
 expected background balanced scores for cis-interactions. If
 specified with background_trans_file, the sampler will
 return corresponding background array that matches with
 the 2D feature retrieved.</p></li>
-<li><p><strong>background_trans_file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Path to the numpy file that stores the expected background
+<li><p><strong>background_trans_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Path to the numpy file that stores the expected background
 balanced scores for trans-interactions. See doc for
 <cite>background_cis_file</cite> for more detail.</p></li>
-<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 436. Sets the random seed for sampling.</p></li>
-<li><p><strong>validation_holdout</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – Default is <cite>[‘chr6’, ‘chr7’]</cite>. Holdout can be regional or
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 436. Sets the random seed for sampling.</p></li>
+<li><p><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Default is <cite>[‘chr6’, ‘chr7’]</cite>. Holdout can be regional or
 proportional. If regional, expects a list (e.g. <cite>[‘chrX’, ‘chrY’]</cite>).
 Regions must match those specified in the first column of the
 tabix-indexed BED file. If proportional, specify a percentage
 between (0.0, 1.0). Typically 0.10 or 0.20.</p></li>
-<li><p><strong>test_holdout</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>, </em><em>optional</em>) – Default is <cite>[‘chr8’, ‘chr9’]</cite>. See documentation for
+<li><p><strong>test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Default is <cite>[‘chr8’, ‘chr9’]</cite>. See documentation for
 <cite>validation_holdout</cite> for additional information.</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 1000000. Model is trained on sequences of size
+<li><p><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 1000000. Model is trained on sequences of size
 <cite>sequence_length</cite> where genomic features are retreived
 for the same regions as the sequences.</p></li>
-<li><p><strong>max_seg_length</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. If specified and cross_chromosome is True,
+<li><p><strong>max_seg_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If specified and cross_chromosome is True,
 bound the maximum length of each sequence segment.</p></li>
-<li><p><strong>length_schedule</strong> (<em>list</em><em>(</em><em>float</em><em>, </em><em>list</em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>) or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. If specified and cross_chromosome is True,
+<li><p><strong>length_schedule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>)</em><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If specified and cross_chromosome is True,
 decide the sequence segment length to sample according to the
 length schedule (before trimming to fit in the sequence length).
 The length schedule is in the format of <cite>[p, [min_len, max_len]]</cite>,
 which means, with probability <cite>p</cite>, decide the length by randomly
 sampling an integer between <cite>min_len</cite> and <cite>max_len</cite>, and retrieve
 the maximal remaining length as default with probability <cite>1-p</cite>.</p></li>
-<li><p><strong>position_resolution</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 1. Preprocess the sampled start position by
+<li><p><strong>position_resolution</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 1. Preprocess the sampled start position by
 <cite>start = start - start % position_resolution</cite>. Useful for binned
 data.</p></li>
-<li><p><strong>random_shift</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 0. Shift the coordinates to retrieve
+<li><p><strong>random_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 0. Shift the coordinates to retrieve
 sequence by a random integer in the range of [-random_shift, random_shift).</p></li>
-<li><p><strong>random_strand</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, randomly select the strand of the
+<li><p><strong>random_strand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, randomly select the strand of the
 sequence, otherwise alway use the ‘+’ strand.</p></li>
-<li><p><strong>cross_chromosome</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, allows sampling multiple segments of
+<li><p><strong>cross_chromosome</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, allows sampling multiple segments of
 sequences and the corresponding features. The default is sampling
 the maximum length allowed by sequence_length, thus multiple segments
 will only be sampled if <cite>sequence_length</cite> is larger than the minimum
 chromosome length or when max_seg_length and length_schedule is specified
 to limit the sequence segment length.</p></li>
-<li><p><strong>permute_segments</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, permute the order of segments when
+<li><p><strong>permute_segments</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, permute the order of segments when
 multiple segments are sampled.</p></li>
 <li><p><strong>mode</strong> (<em>{'train'</em><em>, </em><em>'validate'</em><em>, </em><em>'test'}</em>) – Default is <cite>‘train’</cite>. The mode to run the sampler in.</p></li>
 </ul>
@@ -536,7 +534,7 @@ multiple segments are sampled.</p></li>
 <dd><p>A genome to retrieve sequence from.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>selene_sdk.sequences.Genome</p>
+<dd class="field-odd"><p><a class="reference external" href="https://selene.flatironinstitute.org/sequences.html#selene_sdk.sequences.Genome" title="(in Selene vmaster (0.4.8))">selene_sdk.sequences.Genome</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -548,7 +546,7 @@ multiple segments are sampled.</p></li>
 would like to predict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>selene_sdk.targets.Target</p>
+<dd class="field-odd"><p><a class="reference external" href="https://selene.flatironinstitute.org/targets.html#selene_sdk.targets.Target" title="(in Selene vmaster (0.4.8))">selene_sdk.targets.Target</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,7 +557,7 @@ would like to predict.</p>
 <dd><p>MultibinGenomicFeatures object that loads 1D genomic feature data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#selene_utils2.MultibinGenomicFeatures" title="selene_utils2.MultibinGenomicFeatures">MultibinGenomicFeatures</a> or None, optional</p>
+<dd class="field-odd"><p><a class="reference internal" href="#selene_utils2.MultibinGenomicFeatures" title="selene_utils2.MultibinGenomicFeatures">MultibinGenomicFeatures</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a>, optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -571,7 +569,7 @@ would like to predict.</p>
 expected background balanced scores for cis-interactions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -582,7 +580,7 @@ expected background balanced scores for cis-interactions.</p>
 <dd><p>The expected background balanced score for trans-interactions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -593,7 +591,7 @@ expected background balanced scores for cis-interactions.</p>
 <dd><p>Whether the sample will retrieve background arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -609,7 +607,7 @@ BED file. If proportional, this is the fraction of total samples
 that will be held out.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(str)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -621,7 +619,7 @@ that will be held out.</p>
 documentation for <cite>validation_holdout</cite> for more details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(str)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -634,7 +632,7 @@ documentation for <cite>validation_holdout</cite> for more details.</p>
 for the same regions as the sequences.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -646,7 +644,7 @@ for the same regions as the sequences.</p>
 bound the maximum length of each sequence segment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -663,7 +661,7 @@ sampling an integer between <cite>min_len</cite> and <cite>max_len</cite>, and r
 the maximal remaining length as default with probability <cite>1-p</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(float, list(int, int)) or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>)) or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -676,7 +674,7 @@ the maximal remaining length as default with probability <cite>1-p</cite>.</p>
 data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -688,7 +686,7 @@ data.</p>
 sequence by a random integer in the range of [-random_shift, random_shift).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -700,7 +698,7 @@ sequence by a random integer in the range of [-random_shift, random_shift).</p>
 sequence, otherwise alway use the ‘+’ strand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -716,7 +714,7 @@ chromosome length or when max_seg_length and length_schedule is specified
 to limit the sequence segment length.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -728,7 +726,7 @@ to limit the sequence segment length.</p>
 multiple segments are sampled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -739,7 +737,7 @@ multiple segments are sampled.</p>
 <dd><p>The list of modes that the sampler can be run in.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(str)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -751,7 +749,7 @@ multiple segments are sampled.</p>
 the modes listed in <cite>modes</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -771,7 +769,7 @@ the modes listed in <cite>modes</cite>.</p>
 <dl class="class">
 <dt id="selene_utils2.SampleIndices">
 <em class="property">class </em><code class="sig-prename descclassname">selene_utils2.</code><code class="sig-name descname">SampleIndices</code><span class="sig-paren">(</span><em class="sig-param">indices</em>, <em class="sig-param">weights</em><span class="sig-paren">)</span><a class="headerlink" href="#selene_utils2.SampleIndices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="method">
 <dt id="selene_utils2.SampleIndices.indices">
 <em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#selene_utils2.SampleIndices.indices" title="Permalink to this definition">¶</a></dt>

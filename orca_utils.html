@@ -165,7 +165,7 @@ including a class for structural variants and plotting utilities.</p>
 <dl class="class">
 <dt id="orca_utils.GRange">
 <em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">GRange</code><span class="sig-paren">(</span><em class="sig-param">chr</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em>, <em class="sig-param">strand</em><span class="sig-paren">)</span><a class="headerlink" href="#orca_utils.GRange" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="method">
 <dt id="orca_utils.GRange.chr">
 <em class="property">property </em><code class="sig-name descname">chr</code><a class="headerlink" href="#orca_utils.GRange.chr" title="Permalink to this definition">¶</a></dt>
@@ -195,7 +195,7 @@ including a class for structural variants and plotting utilities.</p>
 <dl class="class">
 <dt id="orca_utils.LGRange">
 <em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">LGRange</code><span class="sig-paren">(</span><em class="sig-param">len</em>, <em class="sig-param">ref</em><span class="sig-paren">)</span><a class="headerlink" href="#orca_utils.LGRange" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="method">
 <dt id="orca_utils.LGRange.len">
 <em class="property">property </em><code class="sig-name descname">len</code><a class="headerlink" href="#orca_utils.LGRange.len" title="Permalink to this definition">¶</a></dt>
@@ -213,7 +213,7 @@ including a class for structural variants and plotting utilities.</p>
 <dl class="class">
 <dt id="orca_utils.StructuralChange2">
 <em class="property">class </em><code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">StructuralChange2</code><span class="sig-paren">(</span><em class="sig-param">chr_name</em>, <em class="sig-param">length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#StructuralChange2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.StructuralChange2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class stores and manupulating structural changes for a single
 chromosome and allow querying the mutated chromosome by coordinates by providing
 utilities for retrieving the corresponding reference genome segments.</p>
@@ -229,8 +229,8 @@ operations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>chr_name</strong> (<em>str</em>) – Name of the reference chromosome.</p></li>
-<li><p><strong>length</strong> (<em>int</em>) – The length of the reference chromosome.</p></li>
+<li><p><strong>chr_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the reference chromosome.</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of the reference chromosome.</p></li>
 </ul>
 </dd>
 </dl>
@@ -242,7 +242,7 @@ chromosome. Each element is a LGRange namedtuple (length and a
 GRange namedtuple (chr: str, start: int, end: int, strand: str)).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(<a class="reference internal" href="#orca_utils.LGRange" title="orca_utils.LGRange">LGRange</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference internal" href="#orca_utils.LGRange" title="orca_utils.LGRange">LGRange</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -253,7 +253,7 @@ GRange namedtuple (chr: str, start: int, end: int, strand: str)).</p>
 <dd><p>Name of the chromosome</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -266,7 +266,7 @@ key coordinates are 0, segment junction positions, and chromosome end
 coordinate. <cite>coord_points</cite> reflects the current state of the chromosome.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>list(int)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -318,15 +318,15 @@ to the grid as specified by binsize whenever possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>int</em><em> or </em><em>numpy.ndarray</em>) – Coordinates to round.</p></li>
-<li><p><strong>gridsize</strong> (<em>int</em>) – The gridsize to round by</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
+<li><p><strong>gridsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The gridsize to round by</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The clipped coordinate</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,15 +338,15 @@ to the grid as specified by binsize whenever possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>int</em><em> or </em><em>numpy.ndarray</em>) – Coordinates to round.</p></li>
-<li><p><strong>gridsize</strong> (<em>int</em>) – The gridsize to round by</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
+<li><p><strong>gridsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The gridsize to round by</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The rounded coordinate</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -358,35 +358,35 @@ to the grid as specified by binsize whenever possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>output</strong> (<em>dict</em>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
-<li><p><strong>show_genes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
+<li><p><strong>show_genes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
 gene annotations corresponding to all windows used for the multiscale prediction.</p></li>
-<li><p><strong>show_tracks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
+<li><p><strong>show_tracks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, plot the retrieved
 chromatin tracks for CTCF, chromatin accessibility and histone marks
 for all windows used for the multiscale prediction.</p></li>
-<li><p><strong>show_coordinates</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
+<li><p><strong>show_coordinates</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
 genome coordinates.</p></li>
-<li><p><strong>unscaled</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
+<li><p><strong>unscaled</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
 without normalizing by distance-based expectation.</p></li>
-<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
 if set to None.</p></li>
-<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
+<li><p><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
 fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</p></li>
-<li><p><strong>unscaled_cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
+<li><p><strong>unscaled_cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
 balanced contact score). If None, use colormaps.hnh_cmap_ext5.</p></li>
-<li><p><strong>colorbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
-<li><p><strong>maskpred</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
+<li><p><strong>colorbar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
+<li><p><strong>maskpred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
 where the observed data have missing values when observed data are provided
 in output dict.</p></li>
-<li><p><strong>vmin</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
-<li><p><strong>vmax</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+<li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
+<li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -398,30 +398,30 @@ in output dict.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>output</strong> (<em>dict</em>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
-<li><p><strong>show_coordinates</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – The result dictionary to plot as returned by <cite>genomepredict_256Mb</cite>.</p></li>
+<li><p><strong>show_coordinates</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, annotate the generated plot with the
 genome coordinates.</p></li>
-<li><p><strong>unscaled</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
+<li><p><strong>unscaled</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is False. If True, plot the predictions and observations
 without normalizing by distance-based expectation.</p></li>
-<li><p><strong>file</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The output file prefix. No output file is generated
 if set to None.</p></li>
-<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
+<li><p><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The colormap for plotting scaled interactions (log
 fold over distance-based background). If None, use colormaps.hnh_cmap_ext5.</p></li>
-<li><p><strong>unscaled_cmap</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
+<li><p><strong>unscaled_cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. The colormap for plotting unscaled interactions (log
 balanced contact score). If None, use colormaps.hnh_cmap_ext5.</p></li>
-<li><p><strong>colorbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
-<li><p><strong>maskpred</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
+<li><p><strong>colorbar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. Whether to plot the colorbar.</p></li>
+<li><p><strong>maskpred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Default is True. If True, the prediction heatmaps are masked at positions
 where the observed data have missing values when observed data are provided
 in output dict.</p></li>
-<li><p><strong>vmin</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
-<li><p><strong>vmax</strong> (<em>int</em><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+<li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
+<li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -434,16 +434,16 @@ functions such as <cite>genomeplot</cite> and <cite>genomeplot_256Mb</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>anno_scaled</strong> (<em>list</em><em>(</em><em>list</em><em>(</em><em>..</em><em>)</em><em>)</em>) – List of annotations. Each annotation can be a region specified by
+<li><p><strong>anno_scaled</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><em>..</em><em>)</em><em>)</em>) – List of annotations. Each annotation can be a region specified by
 <cite>[start: int, end: int, info:str]</cite> or a position specified by
 <cite>[pos: int, info:str]</cite>.
 Acceptable info strings for region currently include color names for
 matplotlib. Acceptable info strings for position are currently
 ‘single’ or ‘double’, which direct whether the annotation is drawn
 by single or double lines.</p></li>
-<li><p><strong>base</strong> (<em>int</em>) – The starting position of the 32Mb (if window_radius is 16000000)
+<li><p><strong>base</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The starting position of the 32Mb (if window_radius is 16000000)
 or 256Mb (if window_radius is 128000000) region analyzed.</p></li>
-<li><p><strong>window_radius</strong> (<em>int</em>) – The size of the region analyzed. It must be either 16000000 (32Mb region)
+<li><p><strong>window_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the region analyzed. It must be either 16000000 (32Mb region)
 or 128000000 (256Mb region).</p></li>
 </ul>
 </dd>
@@ -452,7 +452,7 @@ or 128000000 (256Mb region).</p></li>
 in the range of 0-1.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>

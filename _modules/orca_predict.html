@@ -197,22 +197,12 @@
 <span class="sd">    Orca models and hg38 reference genome. It also creates Genomic2DFeatures</span>
 <span class="sd">    objects for experimental micro-C  datasets (for comparison with prediction).</span>
 <span class="sd">    Load resourced are accessible as global variables.</span>
+<span class="sd">    </span>
+<span class="sd">    The list of globl variables generated is here:</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    models : list(str)</span>
-<span class="sd">        List of model types to load, supported model types includes</span>
-<span class="sd">        &quot;32M&quot;, &quot;256M&quot;, &quot;1M&quot;, corresponding to 1-32Mb, 32-256Mb, and 1Mb</span>
-<span class="sd">        models. Lower cases are also accepted.  </span>
-<span class="sd">    use_cuda : bool, optional</span>
-<span class="sd">        Default is True. If true, loaded models are moved to GPU.</span>
-<span class="sd">    use_memmapgenome : bool, optional</span>
-<span class="sd">        Default is True. If True and the resource file for hg38 mmap exists,</span>
-<span class="sd">        use MemmapGenome instead of Genome.</span>
-
-<span class="sd">    Global variables</span>
+<span class="sd">    Global Variables</span>
 <span class="sd">    ----------------</span>
-<span class="sd">    hg38 : MemmapGenome or Genome</span>
+<span class="sd">    hg38 : selene_utils2.MemmapGenome or selene_sdk.sequences.Genome</span>
 <span class="sd">        If `use_memmapgenome==True` and the resource file for hg38 mmap exists,</span>
 <span class="sd">        use MemmapGenome instead of Genome.</span>
 <span class="sd">    h1esc : orca_models.H1esc</span>
@@ -227,26 +217,40 @@
 <span class="sd">        1Mb Orca H1-ESC model</span>
 <span class="sd">    hff_1m : orca_models.Hff_1M</span>
 <span class="sd">        1Mb Orca HFF model</span>
-<span class="sd">    target_h1esc : Genomic2DFeatures</span>
+<span class="sd">    target_h1esc : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8</span>
 <span class="sd">        at 4kb resolution, used for comparison with 1-32Mb models.</span>
-<span class="sd">    target_hff : Genomic2DFeatures</span>
+<span class="sd">    target_hff : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9</span>
 <span class="sd">        at 4kb resolution, used for comparison with 1-32Mb models.</span>
-<span class="sd">    target_h1esc_256m : Genomic2DFeatures</span>
+<span class="sd">    target_h1esc_256m : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8</span>
 <span class="sd">        at 32kb resolution, used for comparison with 32-256Mb models.</span>
-<span class="sd">    target_hff_256m : Genomic2DFeatures</span>
+<span class="sd">    target_hff_256m : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9</span>
 <span class="sd">        at 32kb resolution, used for comparison with 32-256Mb models.</span>
-<span class="sd">    target_h1esc_1m : Genomic2DFeatures</span>
+<span class="sd">    target_h1esc_1m : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load H1-ESC micro-C dataset 4DNFI9GMP2J8</span>
 <span class="sd">        at 32kb resolution, used for comparison with 1Mb models.</span>
-<span class="sd">    target_hff_1m : Genomic2DFeatures</span>
+<span class="sd">    target_hff_1m : selene_utils2.Genomic2DFeatures</span>
 <span class="sd">        Genomic2DFeatures object that load HFF micro-C dataset 4DNFI643OYP9</span>
 <span class="sd">        at 1kb resolution, used for comparison with 1Mb models.</span>
 <span class="sd">    target_available : bool</span>
 <span class="sd">        Indicate whether the micro-C dataset resource file is available.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    models : list(str)</span>
+<span class="sd">        List of model types to load, supported model types includes</span>
+<span class="sd">        &quot;32M&quot;, &quot;256M&quot;, &quot;1M&quot;, corresponding to 1-32Mb, 32-256Mb, and 1Mb</span>
+<span class="sd">        models. Lower cases are also accepted.  </span>
+<span class="sd">    use_cuda : bool, optional</span>
+<span class="sd">        Default is True. If true, loaded models are moved to GPU.</span>
+<span class="sd">    use_memmapgenome : bool, optional</span>
+<span class="sd">        Default is True. If True and the resource file for hg38 mmap exists,</span>
+<span class="sd">        use MemmapGenome instead of Genome.</span>
+
+<span class="sd"> </span>
 <span class="sd">&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">hg38</span><span class="p">,</span> <span class="n">target_hff</span><span class="p">,</span> <span class="n">target_h1esc</span><span class="p">,</span> <span class="n">target_hff_256m</span><span class="p">,</span> <span class="n">target_h1esc_256m</span><span class="p">,</span> <span class="n">target_hff_1m</span><span class="p">,</span> <span class="n">target_h1esc_1m</span><span class="p">,</span> <span class="n">target_available</span>
 
