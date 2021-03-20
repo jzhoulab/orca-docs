@@ -951,19 +951,34 @@
 
 
 <span class="k">def</span> <span class="nf">_retrieve_multi</span><span class="p">(</span><span class="n">regionlist</span><span class="p">,</span> <span class="n">genome</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normmat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normmat_regionlist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">genome</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="ow">in</span> <span class="n">regionlist</span>
-    <span class="p">]</span>
+    <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regionlist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="o">=</span> <span class="n">region</span>
+            <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">genome</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">region</span>
+            <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">genome</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">))</span>
+
     <span class="n">sequence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">sequences</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
 
     <span class="k">if</span> <span class="n">target</span> <span class="ow">and</span> <span class="n">target_available</span><span class="p">:</span>
         <span class="n">targets_h1esc</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">targets_hff</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="ow">in</span> <span class="n">regionlist</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regionlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span> <span class="o">=</span> <span class="n">region</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">region</span>
+                <span class="n">strand</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
             <span class="n">th1esc</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">thff</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="p">,</span> <span class="n">strand2</span> <span class="ow">in</span> <span class="n">regionlist</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">region2</span> <span class="ow">in</span> <span class="n">regionlist</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="p">,</span> <span class="n">strand2</span> <span class="o">=</span> <span class="n">region2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="p">,</span> <span class="n">end2</span> <span class="o">=</span> <span class="n">region2</span>
+                    <span class="n">strand</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
                 <span class="n">th1esc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">target_h1esc_256m</span><span class="o">.</span><span class="n">get_feature_data</span><span class="p">(</span>
                         <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">chrom2</span><span class="o">=</span><span class="n">chrom2</span><span class="p">,</span> <span class="n">start2</span><span class="o">=</span><span class="n">start2</span><span class="p">,</span> <span class="n">end2</span><span class="o">=</span><span class="n">end2</span>
@@ -1150,7 +1165,7 @@
             <span class="s2">&quot;Only window_radius 16000000 (32Mb models) or 128000000 (256Mb models) are supported&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mstart</span> <span class="o">-</span> <span class="n">mend</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">*</span><span class="n">window_radius</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mstart</span> <span class="o">-</span> <span class="n">mend</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">window_radius</span><span class="p">:</span>
         <span class="n">anno_scaled</span> <span class="o">=</span> <span class="n">process_anno</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="p">[</span>
