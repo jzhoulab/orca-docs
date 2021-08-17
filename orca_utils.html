@@ -33,6 +33,7 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -321,7 +322,7 @@ to the grid as specified by binsize whenever possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
 <li><p><strong>gridsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The gridsize to round by</p></li>
 </ul>
 </dd>
@@ -341,7 +342,7 @@ to the grid as specified by binsize whenever possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – Coordinates to round.</p></li>
 <li><p><strong>gridsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The gridsize to round by</p></li>
 </ul>
 </dd>
@@ -356,7 +357,7 @@ to the grid as specified by binsize whenever possible.</p>
 
 <dl class="function">
 <dt id="orca_utils.genomeplot">
-<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot</code><span class="sig-paren">(</span><em class="sig-param">output</em>, <em class="sig-param">show_genes=False</em>, <em class="sig-param">show_tracks=False</em>, <em class="sig-param">show_coordinates=True</em>, <em class="sig-param">unscaled=False</em>, <em class="sig-param">file=None</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">unscaled_cmap=None</em>, <em class="sig-param">colorbar=True</em>, <em class="sig-param">maskpred=False</em>, <em class="sig-param">vmin=-1</em>, <em class="sig-param">vmax=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot</code><span class="sig-paren">(</span><em class="sig-param">output, show_genes=False, show_tracks=False, show_coordinates=True, unscaled=False, file=None, cmap=None, unscaled_cmap=None, colorbar=True, maskpred=False, vmin=-1, vmax=2, model_labels=['H1-ESC', 'HFF']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the multiscale prediction outputs for 32Mb output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -383,6 +384,7 @@ where the observed data have missing values when observed data are provided
 in output dict.</p></li>
 <li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
 <li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+<li><p><strong>model_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Model labels for plotting. Default is [“H1-ESC”, “HFF”].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -396,7 +398,7 @@ in output dict.</p></li>
 
 <dl class="function">
 <dt id="orca_utils.genomeplot_256Mb">
-<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot_256Mb</code><span class="sig-paren">(</span><em class="sig-param">output</em>, <em class="sig-param">show_coordinates=True</em>, <em class="sig-param">unscaled=False</em>, <em class="sig-param">file=None</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">unscaled_cmap=None</em>, <em class="sig-param">colorbar=True</em>, <em class="sig-param">maskpred=True</em>, <em class="sig-param">vmin=-1</em>, <em class="sig-param">vmax=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot_256Mb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot_256Mb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">orca_utils.</code><code class="sig-name descname">genomeplot_256Mb</code><span class="sig-paren">(</span><em class="sig-param">output, show_coordinates=True, unscaled=False, file=None, cmap=None, unscaled_cmap=None, colorbar=True, maskpred=True, vmin=-1, vmax=2, model_labels=['H1-ESC', 'HFF']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/orca_utils.html#genomeplot_256Mb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#orca_utils.genomeplot_256Mb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the multiscale prediction outputs for 256Mb output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -418,6 +420,7 @@ where the observed data have missing values when observed data are provided
 in output dict.</p></li>
 <li><p><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is -1. The lowerbound value for heatmap colormap.</p></li>
 <li><p><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Default is 2. The upperbound value for heatmap colormap.</p></li>
+<li><p><strong>model_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Model labels for plotting. Default is [“H1-ESC”, “HFF”].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

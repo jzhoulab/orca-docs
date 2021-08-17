@@ -1320,15 +1320,15 @@
 
 
 <div class="viewcode-block" id="Net"><a class="viewcode-back" href="../orca_modules.html#orca_modules.Net">[docs]</a><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_1d_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_1d</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Orca 1Mb model. The trained model weighted can be</span>
 <span class="sd">        loaded into Encoder and Decoder_1m modules.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        num_1d_features : int or None, optional</span>
-<span class="sd">            The number of 1D features used for the auxiliary</span>
+<span class="sd">        num_1d : int or None, optional</span>
+<span class="sd">            The number of 1D targets used for the auxiliary</span>
 <span class="sd">            task of predicting ChIP-seq profiles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -1733,15 +1733,15 @@
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">num_1d_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">num_1d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">final_1d</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
                 <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
                 <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span>
                 <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-                <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_1d_features</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_1d</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
                 <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_1d_features</span> <span class="o">=</span> <span class="n">num_1d_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_1d</span> <span class="o">=</span> <span class="n">num_1d</span>
 
 <div class="viewcode-block" id="Net.forward"><a class="viewcode-back" href="../orca_modules.html#orca_modules.Net.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Forward propagation of a batch.&quot;&quot;&quot;</span>
@@ -1763,7 +1763,7 @@
             <span class="n">out7</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv7</span><span class="p">(</span><span class="n">lout7</span><span class="p">)</span>
             <span class="n">mat</span> <span class="o">=</span> <span class="n">out7</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">out7</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">cur</span> <span class="o">=</span> <span class="n">mat</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d_features</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d</span><span class="p">:</span>
                 <span class="n">output1d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_1d</span><span class="p">(</span><span class="n">out7</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">cur</span><span class="p">,</span> <span class="n">output1d</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1771,7 +1771,7 @@
 
         <span class="n">dummy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">dummy</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d_features</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d</span><span class="p">:</span>
             <span class="n">cur</span><span class="p">,</span> <span class="n">output1d</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">(</span><span class="n">run0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dummy</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cur</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">(</span><span class="n">run0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dummy</span><span class="p">)</span>
@@ -1807,7 +1807,7 @@
         <span class="n">cur</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">(</span><span class="n">run2</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">(</span><span class="n">run3</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d_features</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_1d</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cur</span><span class="p">,</span> <span class="n">output1d</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cur</span></div></div>

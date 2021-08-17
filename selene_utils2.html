@@ -171,10 +171,11 @@ module contains code from selene.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_paths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of paths to the Cooler datasets. For mcool files,
+<li><p><strong>input_paths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – List of paths to the Cooler datasets or a path to a single
+Cooler dataset. For mcool files,
 the path should include the resolution. Please refer to
 cooler.Cooler documentation for support of mcool files.</p></li>
-<li><p><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of dataset names that should match the <cite>input_path</cite>.</p></li>
+<li><p><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The list of dataset names that should match the <cite>input_path</cite>.</p></li>
 <li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>)</em>) – The shape of the output array (# of bins by # of bins).</p></li>
 <li><p><strong>cg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <cite>yes</cite>, adpative coarse-graining is applied to the output.</p></li>
 </ul>
@@ -246,7 +247,7 @@ where the index is the position of the feature in <cite>features</cite>.</p>
 
 <dl class="class">
 <dt id="selene_utils2.MemmapGenome">
-<em class="property">class </em><code class="sig-prename descclassname">selene_utils2.</code><code class="sig-name descname">MemmapGenome</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">blacklist_regions=None</em>, <em class="sig-param">bases_order=None</em>, <em class="sig-param">init_unpickable=False</em>, <em class="sig-param">memmapfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_utils2.</code><code class="sig-name descname">MemmapGenome</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">blacklist_regions=None</em>, <em class="sig-param">bases_order=None</em>, <em class="sig-param">init_unpicklable=False</em>, <em class="sig-param">memmapfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_utils2.html#MemmapGenome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_utils2.MemmapGenome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.genome.Genome</span></code></p>
 <p>Memmapped version of selene.sequence.Genome. Faster for sequence
 retrieval by storing all precomputed one-hot encodings in a memmapped
@@ -334,7 +335,7 @@ and/or <cite>end</cite> are out of bounds to return a sequence of length
 <span class="math notranslate nohighlight">\(L = end - start\)</span>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, dtype=numpy.float32</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a>, dtype=numpy.float32</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If it cannot retrieve encoding that matches the length <cite>L = end - start</cite>
@@ -374,7 +375,7 @@ sequence contains any unknown base(s) specified in self.UNK_BASE</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a>)</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If it cannot retrieve encoding that matches the length <cite>L = end - start</cite>
@@ -544,7 +545,7 @@ For `mode==’proportion’</cite>, the proportion of overlap will be assigned.<
 and <span class="math notranslate nohighlight">\(N =\)</span> <cite>self.n_features</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -659,7 +660,7 @@ would like to predict.</p>
 expected background balanced scores for cis-interactions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -873,14 +874,15 @@ specified). The shape of <cite>sequences</cite> will be
 <span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
 <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
 <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
-The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times M \times M\)</span>,
-where <span class="math notranslate nohighlight">\(M \times M\)</span> is target.shape. The shape of 1D targets
+The shape of <cite>targets</cite> depends on target.shape. For example it
+will be <span class="math notranslate nohighlight">\(B \times M \times M\)</span>,
+when <span class="math notranslate nohighlight">\(M \times M\)</span> is target.shape. The shape of 1D targets
 is <span class="math notranslate nohighlight">\(B \times K \times F\)</span>, where <span class="math notranslate nohighlight">\(K = \)</span>
 and <span class="math notranslate nohighlight">\(F =\)</span> <cite>self.n_features</cite>. The shape of background matrices
 are the same as <cite>targets</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, ..)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a>, ..)</p>
 </dd>
 </dl>
 </dd></dl>
